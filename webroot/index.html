@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Canvas Test</title>
+</head>
+<body>
+  <section>
+    <div>
+      <canvas id="canvas" width="400" height="300">
+        This text is displayed if your browser does not support HTML5 Canvas.
+      </canvas>
+    </div>
+
+    <script type="text/javascript">
+
+      // var colorList = [
+      //   'blue',
+      //   'green',
+      //   'yellow',
+      //   'black',
+      //   'orange',
+      //   'pink',
+      //   'red'
+      // ];
+      // var randomNumber = Math.floor(Math.random()*colorList.length);
+      // $('#nameuser').val(colorList[randomNumber]);
+
+      var canvas;
+      var ctx;
+      var dx = 5;
+      var dy = 5;
+      var tankWidth = 20;
+      var tankHeight = 20;
+      var x = 0;
+      var y = 0;
+      var users = [];
+      var WIDTH = 400;
+      var HEIGHT = 300;
+
+      var websocket = new WebSocket("ws://localhost:8080/entry");
+
+      websocket.onmessage = function(str) {
+        console.log("Someone sent: ", str.data);
+        js = JSON.parse(str.data);
+        x = js.positionX;
+        y = js.positionY;
+        users = [];
+        for (id in js.users)
+        {
+          users[js.users[id].id] = js.users[id];
+        }
+      };
+     
+      function rect(x,y,w,h,stroke) {
+        ctx.beginPath();
+        ctx.rect(x,y,w,h);
+        ctx.closePath();
+        ctx.fill();
+        if(stroke)
+        {
+          ctx.stroke();
+        }
+      }
+
+      function clear() {
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+      }
+
+      function init() {
+        canvas = document.getElementById("canvas");
+        ctx = canvas.getContext("2d");
+        return setInterval(draw, 30);
+      }
+
+      function websocketAction(action){
+        websocket.send(JSON.stringify({
+            // author: $('#nameuser').val(),
+            body: action
+          }));
+      }
+
+      function doKeyDown(evt){
+        switch (evt.keyCode) {
+          case 32:  /* Space was pressed */
+            websocketAction("fire");
+          break;
+          case 38:  /* Up arrow was pressed */
+            websocketAction("up");
+          break;
+          case 40:  /* Down arrow was pressed */
+            websocketAction("down");
+          break;
+          case 37:  /* Left arrow was pressed */
+            websocketAction("left");
+          break;
+          case 39:  /* Right arrow was pressed */
+            websocketAction("right");
+          break;
+        }
+      }
+
+      function draw() {
+        clear();
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "black";
+        rect(0,0,WIDTH,HEIGHT, true);
+        for (k in users) {
+          ctx.fillStyle = users[k].color;
+          rect(users[k].posX, users[k].posY, tankWidth, tankHeight, false);
+        }
+      }
+
+      init();
+      window.addEventListener('keydown',doKeyDown,true);
+    </script>
+  </section>
+</body>
+</html>
