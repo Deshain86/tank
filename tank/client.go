@@ -119,8 +119,8 @@ func (c *Client) listenRead() {
 func buildAnswer(msg *Answer) string {
 	var result string
 	for _, u := range msg.Users {
-		result += fmt.Sprintf("T;%d;%s;%d;%d;%d;%d;\n",
-			u.Id, u.Color, u.PositionX, u.PositionY, 0, 100)
+		result += fmt.Sprintf("T;%d;%s;%d;%d;%d;%d;%d;\n",
+			u.Id, u.Color, u.PositionX, u.PositionY, u.Direction, u.Direction, 100)
 	}
 	return result
 }
@@ -128,8 +128,8 @@ func buildAnswer(msg *Answer) string {
 /*
 Odpowiedz format
 tank
-obiekt;id;color;pozycjaX;pozycjaY;obrot;zycie(hp);
-T;1;R;10;10;360;50;
+obiekt;id;color;pozycjaX;pozycjaY;obrot;obrot_lufy;zycie(hp);
+T;1;R;10;10;0;0;50;
 
 kolor R G B K
 
