@@ -40,17 +40,7 @@ func (self *Server) ParseResponse(msg *Message, clientId int) {
 	case "up":
 		tmp.Direction = 0
 		tmp.Moving = true
-	case "right2":
-		tmp.Direction = 90
-		tmp.Moving = false
-	case "left2":
-		tmp.Direction = 270
-		tmp.Moving = false
-	case "down2":
-		tmp.Direction = 180
-		tmp.Moving = false
-	case "up2":
-		tmp.Direction = 0
+	case "right2", "left2", "down2", "up2":
 		tmp.Moving = false
 	}
 	self.clients[clientId] = tmp
@@ -65,19 +55,6 @@ func (self *Server) BuildAnswer(clientId int) Answer {
 			u.Color = "b"
 		} else {
 			u.Color = "r"
-		}
-
-		if user.Moving {
-			switch user.Direction {
-			case 0:
-				user.PositionY--
-			case 90:
-				user.PositionX++
-			case 180:
-				user.PositionY++
-			case 270:
-				user.PositionX--
-			}
 		}
 
 		u.PositionX = user.PositionX

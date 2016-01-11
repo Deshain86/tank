@@ -76,6 +76,19 @@ func (s *Server) sendPastMessages(c *Client) {
 
 func (s *Server) sendAll() {
 	for _, c := range s.clients {
+
+		if c.Moving {
+			switch c.Direction {
+			case 0:
+				c.PositionY--
+			case 90:
+				c.PositionX++
+			case 180:
+				c.PositionY++
+			case 270:
+				c.PositionX--
+			}
+		}
 		m := s.BuildAnswer(c.id)
 		c.Write(&m)
 	}

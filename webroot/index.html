@@ -197,31 +197,36 @@
     }
 
     function doKeyUp(evt){
+    	var direction;
       switch (evt.keyCode) {
         case 38:
           if (keyUpPressed) {
-            websocketAction("up2");
+            direction = "up2";
             keyUpPressed = false;
           }
         break;
         case 40:  /* Down arrow was pressed */
           if (keyDownPressed) {
-            websocketAction("down2");
+            direction = "down2";
             keyDownPressed = false;
           }
         break;
         case 37:  /* Left arrow was pressed */
           if (keyLeftPressed) {
-            websocketAction("left2");
+            direction = "left2";
             keyLeftPressed = false;
           }
         break;
         case 39:  /* Right arrow was pressed */
           if (keyRightPressed) {
-            websocketAction("right2");
+            direction = "right2";
             keyRightPressed = false;
           }
         break;
+      }
+      if(!keyUpPressed && !keyDownPressed && !keyLeftPressed && !keyRightPressed)
+      {
+      	websocketAction(direction);
       }
     }
 
