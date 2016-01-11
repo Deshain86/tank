@@ -32,7 +32,7 @@
 		var barrelList = ["barrelBlack.png", "barrelBlue.png", "barrelGreen.png", "barrelRed.png"];
 		
 		var bulletPath = "./resources/Bullets/";
-		var bulletList = [""];
+		var bulletList = ["bulletSilverSilver.png", "bulletBlueSilver.png", "bulletGreenSilver.png", "bulletRedSilver.png"];
 		
 		var tanksImages = [];
 		var barrelImages = [];
@@ -65,9 +65,9 @@
 			}
 		}
 	
-		function tank(x, y, w, h, c, d) {	// x, y - coords; w, h - dimensions; c - color; d - direction
+		function drawObject(t, x, y, w, h, c, d) {	// t - type; x, y - coords; w, h - dimensions; c - color; d - direction
 			var index = 0;
-			var angle = 0;
+			var angle = d;
 			
 			switch (c) {
 				case "k":
@@ -84,21 +84,6 @@
 					break;			
 			}
 			
-			switch (d) {
-				case "u":
-					angle = 0;
-					break;
-				case "d":
-					angle = 180;
-					break;
-				case "l":
-					angle = -90;
-					break;
-				case "r":
-					angle = 90;
-					break;
-			}
-			
 			// save the current co-ordinate system 
 			// before we screw with it
 			ctx.save(); 
@@ -112,9 +97,16 @@
 	 
 			// draw it up and to the left by half the width
 			// and height of the image 
-			ctx.drawImage(tanksImages[index], -(tanksImages[index].width/2), -(tanksImages[index].height/2));
-			ctx.drawImage(barrelImages[index], -(barrelImages[index].width/2), -(barrelImages[index].height/2) -20);
-			//ctx.drawImage(tanksImages[index], 0, 0, 75, 70, x, y, w, h)
+			switch (t) {
+				case "tank":
+					ctx.drawImage(tanksImages[index], -(tanksImages[index].width/2), -(tanksImages[index].height/2));
+					ctx.drawImage(barrelImages[index], -(barrelImages[index].width/2), -(barrelImages[index].height/2) -20);
+					//ctx.drawImage(tanksImages[index], 0, 0, 75, 70, x, y, w, h)
+					break;
+				case "bullet":
+					ctx.drawImage(bulletImages[index], -(bulletImages[index].width/2), -(bulletImages[index].height/2));
+					break;
+			}
 			
 			// and restore the co-ords to how they were when we began
 			ctx.restore(); 
@@ -136,6 +128,10 @@
 				var brl = new Image();
 				brl.src = tanksPath + barrelList[i];
 				barrelImages.push(brl);
+				
+				var bul = new Image();
+				bul.src = bulletPath + bulletList[i];
+				bulletImages.push(bul);
 			}
 			
 			return setInterval(draw, 30);
@@ -179,8 +175,12 @@
 			rect(0, 0, WIDTH, HEIGHT, true);
 			
 			for (k in users) {
-				tank(users[k].posX, users[k].posY, tankWidth, tankHeight, users[k].color, lastPressed);
+				drawObject("tank", users[k].posX, users[k].posY, tankWidth, tankHeight, users[k].color, users[k].direction);
 			}
+			
+			//for (k in bullets) {
+			//	drawObject("bullet", bullets[k].posX, bullets[k].posY, bulletWidth, bulletHeight, bullets[k].color, bullets[k].direction);
+			//}
 		}
 
 		init();
