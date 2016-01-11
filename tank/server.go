@@ -58,9 +58,7 @@ func (s *Server) Del(c *Client) {
 }
 
 func (s *Server) SendAll(msg *Message, clientId int) {
-
 	s.ParseResponse(msg, clientId)
-	s.sendAllCh <- msg
 }
 
 func (s *Server) Done() {
@@ -138,6 +136,7 @@ func (s *Server) Listen() {
 			log.Println("Error:", err.Error())
 
 		case <-s.doneCh:
+			log.Println("asdas")
 			return
 		}
 	}
