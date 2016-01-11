@@ -41,9 +41,9 @@ func (self *Server) BuildAnswer(clientId int) Answer {
 		var u User
 		u.Id = user.id
 		if clientId == user.id {
-			u.Color = "black"
+			u.Color = "b"
 		} else {
-			u.Color = "red"
+			u.Color = "r"
 		}
 		u.PositionX = user.PositionX
 		u.PositionY = user.PositionY

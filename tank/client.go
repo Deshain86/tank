@@ -74,7 +74,7 @@ func (c *Client) listenWrite() {
 		// send message to the client
 		case msg := <-c.ch:
 			log.Println("Send:", msg)
-			websocket.JSON.Send(c.ws, msg)
+			websocket.Message.Send(c.ws, buildAnswer(msg))
 
 		// receive done request
 		case <-c.doneCh:
@@ -112,3 +112,22 @@ func (c *Client) listenRead() {
 		}
 	}
 }
+
+func buildAnswer(msg *Answer) string {
+	var result string
+	for _, u := range msg.Users {
+		result += fmt.Sprintf("T;%d;%s;%d;%d;%d;%d;\n",
+			u.Id, u.Color, u.PositionX, u.PositionY, 0, 100)
+	}
+	return result
+}
+
+/*
+Odpowiedz format
+tank
+obiekt;id;color;pozycjaX;pozycjaY;obrot;zycie(hp);
+T;1;R;10;10;360;50;
+
+kolor R G B K
+
+*/
