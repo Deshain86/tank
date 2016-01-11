@@ -48,12 +48,12 @@
 
      websocket.onmessage = function(str) {
         console.log(str.data);
-        data = str.data.split("\n");
+        datalist = str.data.split("\n");
         // x = 10;
         // y = 10;
         users = [];
-        for (k in data) {
-          parseLine(data[k]);
+        for (k in datalist) {
+          parseLine(datalist[k]);
         }
       };
 
