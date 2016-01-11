@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"./tank"
 )
@@ -13,6 +14,8 @@ func main() {
 	// websocket server
 	server := tank.NewServer("/entry")
 	go server.Listen()
+	ticker := time.NewTicker(time.Second / 30)
+	go server.RunInterval(ticker)
 
 	// static files
 	http.Handle("/", http.FileServer(http.Dir("webroot")))

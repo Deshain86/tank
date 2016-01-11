@@ -11,8 +11,9 @@ import (
 const channelBufSize = 100
 
 var maxId int = 0
+var fullLife int = 100
+var defaultDirection int = 0
 
-// Chat client.
 type Client struct {
 	id        int
 	ws        *websocket.Conn
@@ -21,6 +22,9 @@ type Client struct {
 	doneCh    chan bool
 	PositionX int
 	PositionY int
+	Life      int
+	Direction int
+	Moving    bool
 }
 
 // Create new chat client.
@@ -38,7 +42,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	ch := make(chan *Answer, channelBufSize)
 	doneCh := make(chan bool)
 
-	return &Client{maxId, ws, server, ch, doneCh, 10, 10}
+	return &Client{maxId, ws, server, ch, doneCh, 10, 10, fullLife, defaultDirection, false}
 }
 
 func (c *Client) Conn() *websocket.Conn {

@@ -3,6 +3,7 @@ package tank
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"golang.org/x/net/websocket"
 )
@@ -57,18 +58,6 @@ func (s *Server) Del(c *Client) {
 }
 
 func (s *Server) SendAll(msg *Message, clientId int) {
-	// tmp := users[msg.Author]
-	// switch msg.Body {
-	// case "right":
-	// 	tmp.x++
-	// case "left":
-	// 	tmp.x--
-	// case "down":
-	// 	tmp.y++
-	// case "up":
-	// 	tmp.y--
-	// }
-	// users[msg.Author] = tmp
 
 	s.ParseResponse(msg, clientId)
 	s.sendAllCh <- msg
@@ -87,10 +76,24 @@ func (s *Server) sendPastMessages(c *Client) {
 	c.Write(&x)
 }
 
-func (s *Server) sendAll(msg *Message) {
+func (s *Server) sendAll() {
 	for _, c := range s.clients {
 		m := s.BuildAnswer(c.id)
 		c.Write(&m)
+	}
+}
+
+func (s *Server) RunInterval(ticker *time.Ticker) {
+
+	for {
+		select {
+		case <-ticker.C:
+			s.sendAll()
+			//		default:
+			//			log.Println("wtf stop")
+			//			ticker.Stop()
+			//			return
+		}
 	}
 }
 
@@ -130,12 +133,6 @@ func (s *Server) Listen() {
 		case c := <-s.delCh:
 			log.Println("Delete client")
 			delete(s.clients, c.id)
-
-		// broadcast message for all clients
-		case msg := <-s.sendAllCh:
-			log.Println("Send all:", msg)
-			s.messages = append(s.messages, msg)
-			s.sendAll(msg)
 
 		case err := <-s.errCh:
 			log.Println("Error:", err.Error())
