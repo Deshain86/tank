@@ -1,4 +1,4 @@
-package chat
+package tank
 
 type Message struct {
 	Author    string `json:"author"`
