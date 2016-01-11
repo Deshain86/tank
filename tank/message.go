@@ -17,10 +17,11 @@ type Answer struct {
 }
 
 type User struct {
-	Id        int    `json:"id"`
-	Color     string `json:"color"`
-	PositionX int    `json:"posX"`
-	PositionY int    `json:"posY"`
+	Id        int
+	Color     string
+	PositionX int
+	PositionY int
+	Direction int
 }
 
 // func (self *Message) ParseResponse(clientId int) {
@@ -82,6 +83,7 @@ func (self *Server) BuildAnswer(clientId int) Answer {
 
 		u.PositionX = user.PositionX
 		u.PositionY = user.PositionY
+		u.Direction = user.Direction
 		ans.Users = append(ans.Users, u)
 	}
 	return ans
