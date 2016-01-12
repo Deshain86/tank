@@ -13,6 +13,7 @@ const channelBufSize = 100
 var maxId int = 0
 var fullLife int = 100
 var defaultDirection int = 0
+var prev string
 
 type Client struct {
 	id        int
@@ -20,10 +21,11 @@ type Client struct {
 	server    *Server
 	ch        chan *Answer
 	doneCh    chan bool
-	PositionX int
-	PositionY int
+	PositionX float32
+	PositionY float32
 	Life      int
 	Direction int
+	Speed     float32
 	Moving    bool
 }
 
@@ -42,7 +44,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	ch := make(chan *Answer, channelBufSize)
 	doneCh := make(chan bool)
 
-	return &Client{maxId, ws, server, ch, doneCh, 10, 10, fullLife, defaultDirection, false}
+	return &Client{maxId, ws, server, ch, doneCh, float32(10), float32(10), fullLife, defaultDirection, float32(2), false}
 }
 
 func (c *Client) Conn() *websocket.Conn {
@@ -119,7 +121,7 @@ func (c *Client) listenRead() {
 func buildAnswer(msg *Answer) string {
 	var result string
 	for _, u := range msg.Users {
-		result += fmt.Sprintf("T;%d;%s;%d;%d;%d;%d;%d;\n",
+		result += fmt.Sprintf("T;%d;%s;%f;%f;%d;%d;%d;\n",
 			u.Id, u.Color, u.PositionX, u.PositionY, u.Direction, u.Direction, 100)
 	}
 	return result

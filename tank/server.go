@@ -80,13 +80,13 @@ func (s *Server) sendAll() {
 		if c.Moving {
 			switch c.Direction {
 			case 0:
-				c.PositionY--
+				c.PositionY = c.PositionY - c.Speed
 			case 90:
-				c.PositionX++
+				c.PositionX = c.PositionX + c.Speed
 			case 180:
-				c.PositionY++
+				c.PositionY = c.PositionY + c.Speed
 			case 270:
-				c.PositionX--
+				c.PositionX = c.PositionX - c.Speed
 			}
 		}
 		m := s.BuildAnswer(c.id)

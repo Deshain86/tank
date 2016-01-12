@@ -42,12 +42,13 @@
     var tanksImages = [];
     var barrelImages = [];
     var bulletImages = [];
+    var pressed = [];
     
     var lastPressed = "u";
         var websocket = new WebSocket("ws://localhost:8080/entry");
 
      websocket.onmessage = function(str) {
-        console.log(str.data);
+        // console.log(str.data);
         datalist = str.data.split("\n");
         // x = 10;
         // y = 10;
@@ -166,28 +167,33 @@
     function doKeyDown(evt){
       switch (evt.keyCode) {
         case 32:  /* Space was pressed */
+
           websocketAction("fire");
           break;
         case 38:
           if (!keyUpPressed) {
+            pressed.push("up");
             keyUpPressed = true;
             websocketAction("up");
           }
         break;
         case 40:  /* Down arrow */
           if (!keyDownPressed) {
+            pressed.push("down");
             keyDownPressed = true;
             websocketAction("down");
           }
         break;
         case 37:  /* Left arrow was pressed */
           if (!keyLeftPressed) {
+            pressed.push("left");
             keyLeftPressed = true;
             websocketAction("left");
           }
         break;
         case 39:  /* Right arrow was pressed */
           if (!keyRightPressed) {
+            pressed.push("right");
             keyRightPressed = true;
             websocketAction("right");
           }
@@ -201,32 +207,53 @@
         case 38:
           if (keyUpPressed) {
             direction = "up2";
+            removePressed('up');
             keyUpPressed = false;
           }
         break;
         case 40:  /* Down arrow was pressed */
           if (keyDownPressed) {
             direction = "down2";
+            removePressed('down');
             keyDownPressed = false;
           }
         break;
         case 37:  /* Left arrow was pressed */
           if (keyLeftPressed) {
             direction = "left2";
+            removePressed('left');
             keyLeftPressed = false;
           }
         break;
         case 39:  /* Right arrow was pressed */
           if (keyRightPressed) {
             direction = "right2";
+            removePressed('right');
             keyRightPressed = false;
           }
         break;
       }
-      if(!keyUpPressed && !keyDownPressed && !keyLeftPressed && !keyRightPressed)
+      if(pressed.length == 0 && direction)
       {
       	websocketAction(direction);
       }
+      else if (pressed.length > 0 && direction)
+      {
+        websocketAction(pressed[pressed.length - 1]);
+      }
+    }
+
+    function removePressed(direction) {
+      var selected = -1;
+      for (var i = 0; i < pressed.length; i++)
+      {
+        if(pressed[i] == direction)
+        {
+          selected = i;
+          break;
+        }
+      }
+      pressed.splice(selected, 1);
     }
 
     function draw() {
