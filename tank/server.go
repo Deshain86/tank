@@ -12,7 +12,9 @@ const bulletSpeed float32 = 4
 const canvasSizeX float32 = 800
 const canvasSizeY float32 = 800
 const tankWidth float32 = 37
+const tankWidthHalf float32 = 15
 const tankHeight float32 = 35
+const tankHeightHalf float32 = 14
 const defaultTankSpeed float32 = 2
 
 var refreshModifier float32 = 1
@@ -132,7 +134,11 @@ func (s *Server) sendAll() {
 		if c.Fire {
 			if c.LastFire == 0 {
 				c.LastFire = 10
-				s.bullets = append(s.bullets, &Bullet{x: c.PositionX, y: c.PositionY, direction: c.Direction})
+				s.bullets = append(s.bullets,
+					&Bullet{
+						x:         c.PositionX + tankWidthHalf,
+						y:         c.PositionY + tankHeightHalf,
+						direction: c.Direction})
 			}
 			c.LastFire--
 		}

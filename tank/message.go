@@ -54,8 +54,8 @@ func (self *Server) ParseResponse(msg *Message, clientId int) {
 func (self *Server) BuildAnswer(clientId int) string {
 	var result string
 	for _, u := range self.bullets {
-		result += fmt.Sprintf("B;%.0f;%.0f;\n",
-			u.x, u.y)
+		result += fmt.Sprintf("B;%.0f;%.0f;%d;\n",
+			u.x, u.y, u.direction)
 	}
 	for _, user := range self.clients {
 		color := "r"

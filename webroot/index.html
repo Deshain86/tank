@@ -19,9 +19,12 @@
     var dy = 5;
     var tankWidth = 37;
     var tankHeight = 35;
+    var bulletWidth = 7;
+    var bulletHeight = 5;
     var x = 0;
     var y = 0;
     var users = [];
+    var bullets = [];
     var WIDTH = 800;
     var HEIGHT = 800;
 
@@ -54,6 +57,7 @@
         // x = 10;
         // y = 10;
         users = [];
+        bullets = [];
         for (k in datalist) {
           parseLine(datalist[k]);
         }
@@ -71,6 +75,12 @@
                 posY: parseInt(data[4]), 
                 color: data[2],
                 direction: parseInt(data[5])};
+              break;
+            case 'B':
+              bullets.push({
+                posX: parseInt(data[1]), 
+                posY: parseInt(data[2]), 
+                direction: parseInt(data[3])});
               break;
           }
         }
@@ -275,6 +285,9 @@
       ctx.strokeStyle = "black";
       rect(0, 0, WIDTH, HEIGHT, true);
       
+      for (k in bullets){
+        drawObject("bullet", bullets[k].posX, bullets[k].posY, bulletWidth, bulletHeight, "b", bullets[k].direction);
+      }
       for (k in users) {
         drawObject("tank", users[k].posX, users[k].posY, tankWidth, tankHeight, users[k].color, users[k].direction);
       }
