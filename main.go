@@ -9,7 +9,7 @@ import (
 )
 
 var refreshrate int = 30
-var serverRefreshrate int = 5
+var serverRefreshrate int = 10
 
 func main() {
 	log.SetFlags(log.Lshortfile)

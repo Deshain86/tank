@@ -153,7 +153,6 @@ func (s *Server) sendAll() {
 				}
 			case 90:
 				c.PositionX = c.PositionX + speed
-				log.Println(c.PositionX, tankHeight, canvasSizeX)
 				if c.PositionX+tankHeight >= canvasSizeX {
 					c.PositionX = canvasSizeX - tankHeight
 				}

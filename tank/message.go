@@ -36,17 +36,22 @@ func (self *Server) ParseResponse(msg *Message, clientId int) {
 	case "right":
 		tmp.Direction = 90
 		tmp.Moving = true
+		tmp.Speed = defaultTankSpeed
 	case "left":
 		tmp.Direction = 270
 		tmp.Moving = true
+		tmp.Speed = defaultTankSpeed
 	case "down":
 		tmp.Direction = 180
 		tmp.Moving = true
+		tmp.Speed = defaultTankSpeed
 	case "up":
 		tmp.Direction = 0
 		tmp.Moving = true
+		tmp.Speed = defaultTankSpeed
 	case "right2", "left2", "down2", "up2":
 		tmp.Moving = false
+		tmp.Speed = 0
 	}
 	self.clients[clientId] = tmp
 }
@@ -63,8 +68,8 @@ func (self *Server) BuildAnswer(clientId int) string {
 			color = "b"
 		}
 
-		result += fmt.Sprintf("T;%d;%s;%.0f;%.0f;%d;%d;%d;\n",
-			user.id, color, user.PositionX, user.PositionY, user.Direction, user.Direction, 100)
+		result += fmt.Sprintf("T;%d;%s;%.0f;%.0f;%.0f;%d;%d;%d;\n",
+			user.id, color, user.PositionX, user.PositionY, user.Speed, user.Direction, user.Direction, 100)
 	}
 
 	return result

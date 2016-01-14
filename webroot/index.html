@@ -27,6 +27,10 @@
     var bullets = [];
     var WIDTH = 800;
     var HEIGHT = 800;
+    var bulletSpeed = 4;
+    var refreshrate = 30;
+    var serverRefreshrate = 10;
+    var orgtimes = refreshrate / serverRefreshrate;
 
     var keySpacePressed = false;
     var keyUpPressed = false;
@@ -61,6 +65,57 @@
         for (k in datalist) {
           parseLine(datalist[k]);
         }
+        var times = refreshrate / serverRefreshrate;
+
+        
+        var myVar = setInterval(function(){
+          if(orgtimes == times)
+          {
+            draw();
+          }
+          else
+          {
+            for (k in users) {
+              switch (users[k].direction) {
+                case 0:
+                  users[k].posY = users[k].posY - users[k].speed
+                  if (users[k].posY <= 0) {
+                    users[k].posY = 0
+                  }
+                  break;
+                case 90:
+                  users[k].posX = users[k].posX + users[k].speed
+                  if (users[k].posX+tankHeight >= WIDTH) {
+                    users[k].posX = WIDTH - tankHeight
+                  }
+                  break;
+                case 180:
+                  users[k].posY = users[k].posY + users[k].speed
+                  if (users[k].posY+tankHeight >= HEIGHT) {
+                    users[k].posY = HEIGHT - tankHeight
+                  }
+                  break;
+                case 270:
+                  users[k].posX = users[k].posX - users[k].speed
+                  if (users[k].posX <= 0) {
+                    users[k].posX = 0
+                  }
+                  break;
+              }
+            }
+            draw();
+          }
+          if(times == 1)
+          {
+            clearInterval(myVar);
+          }
+          times--;
+        },1000/refreshrate);
+        // draw();
+        // for (var i=0; i < (refreshrate / serverRefreshrate); i++)
+        // {
+          
+        // }
       };
 
       function parseLine(line){
@@ -71,10 +126,11 @@
           {
             case 'T':
               users[data[1]] = {
-                posX: parseInt(data[3]), 
-                posY: parseInt(data[4]), 
+                posX: parseFloat(data[3]), 
+                posY: parseFloat(data[4]), 
+                speed: parseFloat(data[5]), 
                 color: data[2],
-                direction: parseInt(data[5])};
+                direction: parseFloat(data[6])};
               break;
             case 'B':
               bullets.push({
@@ -165,8 +221,6 @@
         bul.src = bulletPath + bulletList[i];
         bulletImages.push(bul);
       }
-      
-      return setInterval(draw, 30);
     }
 
     function websocketAction(action){
