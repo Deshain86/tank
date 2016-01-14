@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-const bulletSpeed int = 4
+const bulletSpeed float32 = 4
 const canvasSizeX float32 = 800
 const canvasSizeY float32 = 800
 const tankWidth float32 = 37
@@ -28,24 +28,24 @@ type Server struct {
 	errCh     chan error
 }
 
-var users map[int]Positions = make(map[int]Positions)
+// var users map[int]Positions = make(map[int]Positions)
 
-type Positions struct {
-	x int
-	y int
-}
+// type Positions struct {
+// 	x int
+// 	y int
+// }
 
 type Bullet struct {
-	x         int
-	y         int
+	x         float32
+	y         float32
 	direction int
 }
 
 // Create new chat server.
 func NewServer(pattern string) *Server {
+	var bullets []*Bullet
 	messages := []*Message{}
 	clients := make(map[int]*Client)
-	var bullets []*Bullet
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
 	sendAllCh := make(chan *Message)
@@ -91,20 +91,42 @@ func (s *Server) sendPastMessages(c *Client) {
 }
 
 func (s *Server) sendAll() {
-	for _, b := range s.bullets {
+	// log.Print("CNT ", len(s.bullets), len(s.clients))
+	for k, b := range s.bullets {
 		switch b.direction {
 		case 0:
 			b.y -= bulletSpeed
+			if b.y > canvasSizeY || b.y < 0 {
+				s.bullets = append(s.bullets[:k], s.bullets[k+1:]...)
+			}
 		case 90:
 			b.x += bulletSpeed
+			if b.x > canvasSizeX || b.x < 0 {
+				s.bullets = append(s.bullets[:k], s.bullets[k+1:]...)
+			}
 		case 180:
 			b.y += bulletSpeed
+			if b.y > canvasSizeY || b.y < 0 {
+				s.bullets = append(s.bullets[:k], s.bullets[k+1:]...)
+			}
 		case 270:
 			b.x -= bulletSpeed
+			if b.x > canvasSizeX || b.x < 0 {
+				s.bullets = append(s.bullets[:k], s.bullets[k+1:]...)
+			}
 		}
 	}
 
 	for _, c := range s.clients {
+		if c.Fire {
+			if c.LastFire == 0 {
+				c.LastFire = 10
+				s.bullets = append(s.bullets, &Bullet{x: c.PositionX, y: c.PositionY, direction: c.Direction})
+				// log.Print("FIRE ", len(s.bullets))
+			}
+			// log.Print("TRY FIRE ")
+			c.LastFire--
+		}
 		if c.Moving {
 			switch c.Direction {
 			case 0:

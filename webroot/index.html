@@ -166,11 +166,12 @@
     }
 
     function doKeyDown(evt){
+      console.log(evt.keyCode);
       switch (evt.keyCode) {
         case 32:
-          if (!keyFirePressed) {
+          if (!keySpacePressed) {
             pressed.push("fire");
-            keyFirePressed = true;
+            keySpacePressed = true;
             websocketAction("fire");
           }
           break;

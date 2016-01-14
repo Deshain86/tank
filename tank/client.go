@@ -28,6 +28,7 @@ type Client struct {
 	Speed     float32
 	Moving    bool
 	Fire      bool
+	LastFire  int
 }
 
 // Create new chat client.
@@ -57,7 +58,8 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 		defaultDirection,
 		defaultTankSpeed,
 		false,
-		false}
+		false,
+		0}
 }
 
 func (c *Client) Conn() *websocket.Conn {

@@ -28,9 +28,10 @@ type User struct {
 func (self *Server) ParseResponse(msg *Message, clientId int) {
 	tmp := self.clients[clientId] // users[clientId]
 	switch msg.Body {
-	case "space":
+	case "fire":
 		tmp.Fire = true
-	case "space2":
+		tmp.LastFire = 0
+	case "fire2":
 		tmp.Fire = false
 	case "right":
 		tmp.Direction = 90
@@ -53,7 +54,7 @@ func (self *Server) ParseResponse(msg *Message, clientId int) {
 func (self *Server) BuildAnswer(clientId int) string {
 	var result string
 	for _, u := range self.bullets {
-		result += fmt.Sprintf("B;%d;%d;\n",
+		result += fmt.Sprintf("B;%.0f;%.0f;\n",
 			u.x, u.y)
 	}
 	for _, user := range self.clients {
@@ -62,7 +63,7 @@ func (self *Server) BuildAnswer(clientId int) string {
 			color = "b"
 		}
 
-		result += fmt.Sprintf("T;%d;%s;%f;%f;%d;%d;%d;\n",
+		result += fmt.Sprintf("T;%d;%s;%.0f;%.0f;%d;%d;%d;\n",
 			user.id, color, user.PositionX, user.PositionY, user.Direction, user.Direction, 100)
 	}
 
