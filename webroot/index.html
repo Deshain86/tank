@@ -235,9 +235,10 @@
       switch (evt.keyCode) {
         case 32:
           if (!keySpacePressed) {
-            pressed.push("fire");
+            // pressed.push("fire");
             keySpacePressed = true;
-            websocketAction("fire");
+            // websocketAction("fire");
+            websocketAction('fire');
           }
           break;
         case 38:
@@ -276,8 +277,9 @@
       switch (evt.keyCode) {
         case 32:
           if (keySpacePressed) {
-            direction = "fire2";
-            removePressed('fire');
+            // direction = "fire2";
+            websocketAction('fire2');
+            // removePressed('fire');
             keySpacePressed = false;
           }
         break;
