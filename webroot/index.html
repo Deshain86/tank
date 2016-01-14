@@ -105,11 +105,12 @@
             }
             draw();
           }
+          times--;
           if(times == 1)
           {
             clearInterval(myVar);
           }
-          times--;
+          
         },1000/refreshrate);
         // draw();
         // for (var i=0; i < (refreshrate / serverRefreshrate); i++)
