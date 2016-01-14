@@ -19,7 +19,7 @@ type Client struct {
 	id        int
 	ws        *websocket.Conn
 	server    *Server
-	ch        chan *Answer
+	ch        chan *string
 	doneCh    chan bool
 	PositionX float32
 	PositionY float32
@@ -27,6 +27,7 @@ type Client struct {
 	Direction int
 	Speed     float32
 	Moving    bool
+	Fire      bool
 }
 
 // Create new chat client.
@@ -41,17 +42,29 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	}
 
 	maxId++
-	ch := make(chan *Answer, channelBufSize)
+	ch := make(chan *string, channelBufSize)
 	doneCh := make(chan bool)
 
-	return &Client{maxId, ws, server, ch, doneCh, float32(10), float32(10), fullLife, defaultDirection, float32(2), false}
+	return &Client{
+		maxId,
+		ws,
+		server,
+		ch,
+		doneCh,
+		float32(10),
+		float32(10),
+		fullLife,
+		defaultDirection,
+		float32(2),
+		false,
+		false}
 }
 
 func (c *Client) Conn() *websocket.Conn {
 	return c.ws
 }
 
-func (c *Client) Write(ans *Answer) {
+func (c *Client) Write(ans *string) {
 	select {
 	case c.ch <- ans:
 	default:
@@ -79,7 +92,7 @@ func (c *Client) listenWrite() {
 
 		// send message to the client
 		case msg := <-c.ch:
-			websocket.Message.Send(c.ws, buildAnswer(msg))
+			websocket.Message.Send(c.ws, *msg)
 
 		// receive done request
 		case <-c.doneCh:
@@ -117,22 +130,3 @@ func (c *Client) listenRead() {
 		}
 	}
 }
-
-func buildAnswer(msg *Answer) string {
-	var result string
-	for _, u := range msg.Users {
-		result += fmt.Sprintf("T;%d;%s;%f;%f;%d;%d;%d;\n",
-			u.Id, u.Color, u.PositionX, u.PositionY, u.Direction, u.Direction, 100)
-	}
-	return result
-}
-
-/*
-Odpowiedz format
-tank
-obiekt;id;color;pozycjaX;pozycjaY;obrot;obrot_lufy;zycie(hp);
-T;1;R;10;10;0;0;50;
-
-kolor R G B K
-
-*/

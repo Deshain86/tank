@@ -1,15 +1,19 @@
 package tank
 
+import (
+	"fmt"
+)
+
 type Message struct {
-	Author    string `json:"author"`
-	Body      string `json:"body"`
-	PositionX int    `json:"positionX"`
-	PositionY int    `json:"positionY"`
+	Author    string
+	Body      string
+	PositionX int
+	PositionY int
 }
 
 type Answer struct {
-	Users []User `json:"users"`
-	Body  string `json:"body"`
+	Users   []User
+	Bullets []*Bullet
 }
 
 type User struct {
@@ -24,6 +28,10 @@ type User struct {
 func (self *Server) ParseResponse(msg *Message, clientId int) {
 	tmp := self.clients[clientId] // users[clientId]
 	switch msg.Body {
+	case "space":
+		tmp.Fire = true
+	case "space2":
+		tmp.Fire = false
 	case "right":
 		tmp.Direction = 90
 		tmp.Moving = true
@@ -42,21 +50,31 @@ func (self *Server) ParseResponse(msg *Message, clientId int) {
 	self.clients[clientId] = tmp
 }
 
-func (self *Server) BuildAnswer(clientId int) Answer {
-	var ans Answer
+func (self *Server) BuildAnswer(clientId int) string {
+	var result string
+	for _, u := range self.bullets {
+		result += fmt.Sprintf("B;%d;%d;\n",
+			u.x, u.y)
+	}
 	for _, user := range self.clients {
-		var u User
-		u.Id = user.id
+		color := "r"
 		if clientId == user.id {
-			u.Color = "b"
-		} else {
-			u.Color = "r"
+			color = "b"
 		}
 
-		u.PositionX = user.PositionX
-		u.PositionY = user.PositionY
-		u.Direction = user.Direction
-		ans.Users = append(ans.Users, u)
+		result += fmt.Sprintf("T;%d;%s;%f;%f;%d;%d;%d;\n",
+			user.id, color, user.PositionX, user.PositionY, user.Direction, user.Direction, 100)
 	}
-	return ans
+
+	return result
 }
+
+/*
+Odpowiedz format
+tank
+obiekt;id;color;pozycjaX;pozycjaY;obrot;obrot_lufy;zycie(hp);
+T;1;R;10;10;0;0;50;
+
+kolor R G B K
+
+*/

@@ -25,6 +25,7 @@
     var WIDTH = 800;
     var HEIGHT = 800;
 
+    var keySpacePressed = false;
     var keyUpPressed = false;
     var keyDownPressed = false;
     var keyLeftPressed = false;
@@ -166,9 +167,12 @@
 
     function doKeyDown(evt){
       switch (evt.keyCode) {
-        case 32:  /* Space was pressed */
-
-          websocketAction("fire");
+        case 32:
+          if (!keyFirePressed) {
+            pressed.push("fire");
+            keyFirePressed = true;
+            websocketAction("fire");
+          }
           break;
         case 38:
           if (!keyUpPressed) {
@@ -204,6 +208,13 @@
     function doKeyUp(evt){
     	var direction;
       switch (evt.keyCode) {
+        case 32:
+          if (keySpacePressed) {
+            direction = "fire2";
+            removePressed('fire');
+            keySpacePressed = false;
+          }
+        break;
         case 38:
           if (keyUpPressed) {
             direction = "up2";

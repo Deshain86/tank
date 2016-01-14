@@ -8,11 +8,14 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+const bulletSpeed int = 4
+
 // Chat server.
 type Server struct {
 	pattern   string
 	messages  []*Message
 	clients   map[int]*Client
+	bullets   []*Bullet
 	addCh     chan *Client
 	delCh     chan *Client
 	sendAllCh chan *Message
@@ -27,10 +30,17 @@ type Positions struct {
 	y int
 }
 
+type Bullet struct {
+	x         int
+	y         int
+	direction int
+}
+
 // Create new chat server.
 func NewServer(pattern string) *Server {
 	messages := []*Message{}
 	clients := make(map[int]*Client)
+	var bullets []*Bullet
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
 	sendAllCh := make(chan *Message)
@@ -41,6 +51,7 @@ func NewServer(pattern string) *Server {
 		pattern,
 		messages,
 		clients,
+		bullets,
 		addCh,
 		delCh,
 		sendAllCh,
@@ -75,8 +86,20 @@ func (s *Server) sendPastMessages(c *Client) {
 }
 
 func (s *Server) sendAll() {
-	for _, c := range s.clients {
+	for _, b := range s.bullets {
+		switch b.direction {
+		case 0:
+			b.y -= bulletSpeed
+		case 90:
+			b.x += bulletSpeed
+		case 180:
+			b.y += bulletSpeed
+		case 270:
+			b.x -= bulletSpeed
+		}
+	}
 
+	for _, c := range s.clients {
 		if c.Moving {
 			switch c.Direction {
 			case 0:
@@ -95,7 +118,6 @@ func (s *Server) sendAll() {
 }
 
 func (s *Server) RunInterval(ticker *time.Ticker) {
-
 	for {
 		select {
 		case <-ticker.C:
