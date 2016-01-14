@@ -15,6 +15,8 @@ const tankWidth float32 = 37
 const tankHeight float32 = 35
 const defaultTankSpeed float32 = 2
 
+var refreshModifier float32 = 1
+
 // Chat server.
 type Server struct {
 	pattern   string
@@ -28,13 +30,6 @@ type Server struct {
 	errCh     chan error
 }
 
-// var users map[int]Positions = make(map[int]Positions)
-
-// type Positions struct {
-// 	x int
-// 	y int
-// }
-
 type Bullet struct {
 	x         float32
 	y         float32
@@ -42,7 +37,7 @@ type Bullet struct {
 }
 
 // Create new chat server.
-func NewServer(pattern string) *Server {
+func NewServer(pattern string, mod float32) *Server {
 	var bullets []*Bullet
 	messages := []*Message{}
 	clients := make(map[int]*Client)
@@ -51,6 +46,7 @@ func NewServer(pattern string) *Server {
 	sendAllCh := make(chan *Message)
 	doneCh := make(chan bool)
 	errCh := make(chan error)
+	refreshModifier = mod
 
 	return &Server{
 		pattern,
@@ -92,29 +88,44 @@ func (s *Server) sendPastMessages(c *Client) {
 
 func (s *Server) sendAll() {
 	// log.Print("CNT ", len(s.bullets), len(s.clients))
+	var bSpeed = bulletSpeed * refreshModifier
+	var deleteList []int
 	for k, b := range s.bullets {
 		switch b.direction {
 		case 0:
-			b.y -= bulletSpeed
-			if b.y > canvasSizeY || b.y < 0 {
-				s.bullets = append(s.bullets[:k], s.bullets[k+1:]...)
+			b.y -= bSpeed
+			if b.y < 0 {
+				deleteList = append(deleteList, k)
 			}
 		case 90:
-			b.x += bulletSpeed
-			if b.x > canvasSizeX || b.x < 0 {
-				s.bullets = append(s.bullets[:k], s.bullets[k+1:]...)
+			b.x += bSpeed
+			if b.x > canvasSizeX {
+				deleteList = append(deleteList, k)
 			}
 		case 180:
-			b.y += bulletSpeed
-			if b.y > canvasSizeY || b.y < 0 {
-				s.bullets = append(s.bullets[:k], s.bullets[k+1:]...)
+			b.y += bSpeed
+			if b.y > canvasSizeY {
+				deleteList = append(deleteList, k)
 			}
 		case 270:
-			b.x -= bulletSpeed
-			if b.x > canvasSizeX || b.x < 0 {
-				s.bullets = append(s.bullets[:k], s.bullets[k+1:]...)
+			b.x -= bSpeed
+			if b.x < 0 {
+				deleteList = append(deleteList, k)
 			}
 		}
+	}
+	if len(deleteList) > 0 {
+		var tmp []*Bullet
+	forLoop:
+		for k, b := range s.bullets {
+			for _, del := range deleteList {
+				if del == k {
+					continue forLoop
+				}
+				tmp = append(tmp, b)
+			}
+		}
+		s.bullets = tmp
 	}
 
 	for _, c := range s.clients {
@@ -122,31 +133,31 @@ func (s *Server) sendAll() {
 			if c.LastFire == 0 {
 				c.LastFire = 10
 				s.bullets = append(s.bullets, &Bullet{x: c.PositionX, y: c.PositionY, direction: c.Direction})
-				// log.Print("FIRE ", len(s.bullets))
 			}
-			// log.Print("TRY FIRE ")
 			c.LastFire--
 		}
+
+		var speed = c.Speed * refreshModifier
 		if c.Moving {
 			switch c.Direction {
 			case 0:
-				c.PositionY = c.PositionY - c.Speed
+				c.PositionY = c.PositionY - speed
 				if c.PositionY <= 0 {
 					c.PositionY = 0
 				}
 			case 90:
-				c.PositionX = c.PositionX + c.Speed
+				c.PositionX = c.PositionX + speed
 				log.Println(c.PositionX, tankHeight, canvasSizeX)
 				if c.PositionX+tankHeight >= canvasSizeX {
 					c.PositionX = canvasSizeX - tankHeight
 				}
 			case 180:
-				c.PositionY = c.PositionY + c.Speed
+				c.PositionY = c.PositionY + speed
 				if c.PositionY+tankHeight >= canvasSizeY {
 					c.PositionY = canvasSizeY - tankHeight
 				}
 			case 270:
-				c.PositionX = c.PositionX - c.Speed
+				c.PositionX = c.PositionX - speed
 				if c.PositionX <= 0 {
 					c.PositionX = 0
 				}
