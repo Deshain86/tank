@@ -8,12 +8,14 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-const bulletSpeed int = 4
+const bulletSpeed float32 = 4
 const canvasSizeX float32 = 800
 const canvasSizeY float32 = 800
 const tankWidth float32 = 37
 const tankHeight float32 = 35
 const defaultTankSpeed float32 = 2
+
+var refreshModifier float32 = 1
 
 // Chat server.
 type Server struct {
@@ -36,13 +38,13 @@ type Positions struct {
 }
 
 type Bullet struct {
-	x         int
-	y         int
+	x         float32
+	y         float32
 	direction int
 }
 
 // Create new chat server.
-func NewServer(pattern string) *Server {
+func NewServer(pattern string, mod float32) *Server {
 	messages := []*Message{}
 	clients := make(map[int]*Client)
 	var bullets []*Bullet
@@ -51,6 +53,7 @@ func NewServer(pattern string) *Server {
 	sendAllCh := make(chan *Message)
 	doneCh := make(chan bool)
 	errCh := make(chan error)
+	refreshModifier = mod
 
 	return &Server{
 		pattern,
@@ -91,40 +94,42 @@ func (s *Server) sendPastMessages(c *Client) {
 }
 
 func (s *Server) sendAll() {
+	var bSpeed = bulletSpeed * refreshModifier
 	for _, b := range s.bullets {
 		switch b.direction {
 		case 0:
-			b.y -= bulletSpeed
+			b.y -= bSpeed
 		case 90:
-			b.x += bulletSpeed
+			b.x += bSpeed
 		case 180:
-			b.y += bulletSpeed
+			b.y += bSpeed
 		case 270:
-			b.x -= bulletSpeed
+			b.x -= bSpeed
 		}
 	}
 
 	for _, c := range s.clients {
+		var speed = c.Speed * refreshModifier
 		if c.Moving {
 			switch c.Direction {
 			case 0:
-				c.PositionY = c.PositionY - c.Speed
+				c.PositionY = c.PositionY - speed
 				if c.PositionY <= 0 {
 					c.PositionY = 0
 				}
 			case 90:
-				c.PositionX = c.PositionX + c.Speed
+				c.PositionX = c.PositionX + speed
 				log.Println(c.PositionX, tankHeight, canvasSizeX)
 				if c.PositionX+tankHeight >= canvasSizeX {
 					c.PositionX = canvasSizeX - tankHeight
 				}
 			case 180:
-				c.PositionY = c.PositionY + c.Speed
+				c.PositionY = c.PositionY + speed
 				if c.PositionY+tankHeight >= canvasSizeY {
 					c.PositionY = canvasSizeY - tankHeight
 				}
 			case 270:
-				c.PositionX = c.PositionX - c.Speed
+				c.PositionX = c.PositionX - speed
 				if c.PositionX <= 0 {
 					c.PositionX = 0
 				}
