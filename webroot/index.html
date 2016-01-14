@@ -28,8 +28,8 @@
     var WIDTH = 800;
     var HEIGHT = 800;
     var bulletSpeed = 4;
-    var refreshrate = 30;
-    var serverRefreshrate = 10;
+    var refreshrate = 60;
+    var serverRefreshrate = 15;
     var orgtimes = refreshrate / serverRefreshrate;
 
     var keySpacePressed = false;
@@ -105,13 +105,14 @@
             }
             draw();
           }
-          times--;
+          
           if(times == 1)
           {
             clearInterval(myVar);
           }
+          times--;
           
-        },1000/refreshrate);
+        },(1000/refreshrate));
         // draw();
         // for (var i=0; i < (refreshrate / serverRefreshrate); i++)
         // {
@@ -231,7 +232,6 @@
     }
 
     function doKeyDown(evt){
-      console.log(evt.keyCode);
       switch (evt.keyCode) {
         case 32:
           if (!keySpacePressed) {

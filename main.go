@@ -8,17 +8,17 @@ import (
 	"./tank"
 )
 
-var refreshrate int = 30
-var serverRefreshrate int = 10
+var refreshrate float32 = 60
+var serverRefreshrate float32 = 15
 
 func main() {
 	log.SetFlags(log.Lshortfile)
 
 	// websocket server
-	server := tank.NewServer("/entry", (float32(refreshrate) / float32(serverRefreshrate)))
+	server := tank.NewServer("/entry", (refreshrate / serverRefreshrate))
 	go server.Listen()
 
-	ticker := time.NewTicker(time.Second / time.Duration(serverRefreshrate))
+	ticker := time.NewTicker(time.Second / 15)
 	go server.RunInterval(ticker)
 
 	// static files
