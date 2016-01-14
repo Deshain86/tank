@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-const bulletSpeed float32 = 4
+const bulletSpeed float32 = 8
 const canvasSizeX float32 = 800
 const canvasSizeY float32 = 800
 const tankWidth float32 = 37
@@ -116,6 +116,7 @@ func (s *Server) sendAll() {
 			}
 		}
 	}
+	// log.Print(deleteList)
 	if len(deleteList) > 0 {
 		var tmp []*Bullet
 	forLoop:
@@ -124,22 +125,25 @@ func (s *Server) sendAll() {
 				if del == k {
 					continue forLoop
 				}
-				tmp = append(tmp, b)
 			}
+			tmp = append(tmp, b)
 		}
 		s.bullets = tmp
+		// log.Print(len(s.bullets), len(tmp), len(deleteList))
 	}
 
 	for _, c := range s.clients {
 		if c.Fire {
 			if c.LastFire == 0 {
-				c.LastFire = 10
+				c.LastFire = 5
 				s.bullets = append(s.bullets,
 					&Bullet{
 						x:         c.PositionX + tankWidthHalf,
 						y:         c.PositionY + tankHeightHalf,
 						direction: c.Direction})
 			}
+		}
+		if c.LastFire > 0 {
 			c.LastFire--
 		}
 

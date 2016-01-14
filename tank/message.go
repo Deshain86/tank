@@ -5,10 +5,10 @@ import (
 )
 
 type Message struct {
-	Author    string
-	Body      string
-	PositionX int
-	PositionY int
+	// Author    string
+	Body string
+	// PositionX int
+	// PositionY int
 }
 
 type Answer struct {
@@ -30,7 +30,6 @@ func (self *Server) ParseResponse(msg *Message, clientId int) {
 	switch msg.Body {
 	case "fire":
 		tmp.Fire = true
-		tmp.LastFire = 0
 	case "fire2":
 		tmp.Fire = false
 	case "right":
