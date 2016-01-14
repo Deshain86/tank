@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-const channelBufSize = 100
+const channelBufSize int = 100
 
 var maxId int = 0
 var fullLife int = 100
@@ -55,7 +55,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 		float32(10),
 		fullLife,
 		defaultDirection,
-		float32(2),
+		defaultTankSpeed,
 		false,
 		false}
 }

@@ -9,6 +9,11 @@ import (
 )
 
 const bulletSpeed int = 4
+const canvasSizeX float32 = 800
+const canvasSizeY float32 = 800
+const tankWidth float32 = 37
+const tankHeight float32 = 35
+const defaultTankSpeed float32 = 2
 
 // Chat server.
 type Server struct {
@@ -104,12 +109,25 @@ func (s *Server) sendAll() {
 			switch c.Direction {
 			case 0:
 				c.PositionY = c.PositionY - c.Speed
+				if c.PositionY <= 0 {
+					c.PositionY = 0
+				}
 			case 90:
 				c.PositionX = c.PositionX + c.Speed
+				log.Println(c.PositionX, tankHeight, canvasSizeX)
+				if c.PositionX+tankHeight >= canvasSizeX {
+					c.PositionX = canvasSizeX - tankHeight
+				}
 			case 180:
 				c.PositionY = c.PositionY + c.Speed
+				if c.PositionY+tankHeight >= canvasSizeY {
+					c.PositionY = canvasSizeY - tankHeight
+				}
 			case 270:
 				c.PositionX = c.PositionX - c.Speed
+				if c.PositionX <= 0 {
+					c.PositionX = 0
+				}
 			}
 		}
 		m := s.BuildAnswer(c.id)
