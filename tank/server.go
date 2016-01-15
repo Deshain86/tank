@@ -8,13 +8,18 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-const bulletSpeed float32 = 8
+const bulletSpeed float32 = 6
 const canvasSizeX float32 = 800
 const canvasSizeY float32 = 800
-const tankWidth float32 = 37
-const tankWidthHalf float32 = 15
+
+const tankWidth float32 = 37.5
+const tankWidthHalf float32 = 18.75
 const tankHeight float32 = 35
-const tankHeightHalf float32 = 14
+const tankHeightHalf float32 = 17.5
+
+const bulletWidthHalf float32 = 3
+const bulletHeightHalf float32 = 6.5
+
 const defaultTankSpeed float32 = 2
 
 var refreshModifier float32 = 1
@@ -138,8 +143,8 @@ func (s *Server) sendAll() {
 				c.LastFire = 5
 				s.bullets = append(s.bullets,
 					&Bullet{
-						x:         c.PositionX + tankWidthHalf,
-						y:         c.PositionY + tankHeightHalf,
+						x:         c.PositionX + tankWidthHalf - bulletWidthHalf,
+						y:         c.PositionY + tankHeightHalf - bulletHeightHalf,
 						direction: c.Direction})
 			}
 		}

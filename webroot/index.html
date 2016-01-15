@@ -28,7 +28,7 @@
     var bullets = [];
     var WIDTH = 800;
     var HEIGHT = 800;
-    var bulletSpeed = 4;
+    var bulletSpeed = 6;
     var refreshrate = 60;
     var serverRefreshrate = 15;
     var orgtimes = refreshrate / serverRefreshrate;
@@ -46,7 +46,7 @@
     var barrelList = ["barrelBlack.png", "barrelBlue.png", "barrelGreen.png", "barrelRed.png"];
     
     var bulletPath = "./resources/Bullets/";
-    var bulletList = ["bulletSilverSilver.png", "bulletBlueSilver.png", "bulletGreenSilver.png", "bulletRedSilver.png"];
+    var bulletList = ["bulletBeige.png"];
     
     var tanksImages = [];
     var barrelImages = [];
@@ -195,7 +195,7 @@
 		  ctx.drawImage(barrelImages[index], 0, 0, 16, 50, -8/2, -25/2 - 10, 8, 25);
           break;
         case "bullet":
-		  ctx.drawImage(bulletImages[index], 0, 0, 12, 26, -w/2, -h/2, w, h);
+		  ctx.drawImage(bulletImages[0], 0, 0, 12, 26, -w/2, -h/2, w, h);
           break;
       }
       
