@@ -32,6 +32,9 @@
     var refreshrate = 60;
     var serverRefreshrate = 15;
     var orgtimes = refreshrate / serverRefreshrate;
+	
+	var envWidth = 128;
+	var envHeight = 128;
 
     var keySpacePressed = false;
     var keyUpPressed = false;
@@ -47,10 +50,24 @@
     
     var bulletPath = "./resources/Bullets/";
     var bulletList = ["bulletBeige.png"];
+	
+	var envPath = "./resources/Environment/";
+	var envGroundList = ["dirt.png", "sand.png", "grass.png", "waterShallow.png", "waterDeep.png"];
+	var envObstacleList = ["treeLarge.png", "treeSmall.png"];
+	var envMap = [0, 0, 1, 2, 0, 0, 0, 1,
+		1, 1, 2, 2, 1, 1, 2, 2,
+		1, 0, 0, 0, 2, 2, 2, 2,
+		0, 0, 1, 3, 3, 0, 0, 1,
+		1, 0, 0, 3, 2, 2, 2, 2,
+		1, 1, 2, 2, 1, 1, 2, 2,
+		0, 0, 0, 4, 1, 0, 0, 1,
+		0, 0, 0, 4, 0, 0, 0, 0];
     
     var tanksImages = [];
     var barrelImages = [];
     var bulletImages = [];
+	var envImages = [];
+	
     var pressed = [];
     
     var lastPressed = "u";
@@ -144,6 +161,21 @@
           }
         }
       }
+	
+	function drawGround() {
+		var startX = 0;
+		var startY = 0;
+		
+		for (var i = 0; i < envMap.length; i++) {
+			if (i > 0 && i % 8 == 0) {
+				startX = 0;
+				startY += 100;
+			}
+			
+			ctx.drawImage(envImages[envMap[i]], 0, 0, envWidth, envHeight, startX, startY, 100, 100);
+			startX += 100;
+		}
+	}
 
     function rect(x, y, w, h, stroke) {
       ctx.beginPath();
@@ -219,11 +251,17 @@
         var brl = new Image();
         brl.src = tanksPath + barrelList[i];
         barrelImages.push(brl);
-        
-        var bul = new Image();
-        bul.src = bulletPath + bulletList[i];
-        bulletImages.push(bul);
       }
+	
+	  var bul = new Image();
+      bul.src = bulletPath + bulletList[0];
+      bulletImages.push(bul);
+	
+	  for (var i = 0; i < envGroundList.length; i++) {
+		var env = new Image();
+		env.src = envPath + envGroundList[i]
+		envImages.push(env);
+	  }
     }
 
     function websocketAction(action){
@@ -341,7 +379,9 @@
       
       ctx.fillStyle = "white";
       ctx.strokeStyle = "black";
+	
       rect(0, 0, WIDTH, HEIGHT, true);
+	  drawGround();
       
       for (k in bullets){
         drawObject("bullet", bullets[k].posX, bullets[k].posY, bulletWidth, bulletHeight, "b", bullets[k].direction);
