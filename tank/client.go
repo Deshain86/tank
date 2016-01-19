@@ -15,6 +15,12 @@ var fullLife int = 100
 var defaultDirection int = 0
 var prev string
 
+var firstPosition [][]float32 = [][]float32{
+	[]float32{50, 50},
+	[]float32{canvasSizeX - 100, canvasSizeY - 100},
+	[]float32{50, canvasSizeY - 100},
+	[]float32{canvasSizeX - 100, 50}}
+
 type Client struct {
 	id        int
 	ws        *websocket.Conn
@@ -32,8 +38,7 @@ type Client struct {
 }
 
 // Create new chat client.
-func NewClient(ws *websocket.Conn, server *Server) *Client {
-
+func NewClient(ws *websocket.Conn, server *Server, id int) *Client {
 	if ws == nil {
 		panic("ws cannot be nil")
 	}
@@ -45,6 +50,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	maxId++
 	ch := make(chan *string, channelBufSize)
 	doneCh := make(chan bool)
+	position := firstPosition[id%4]
 
 	return &Client{
 		maxId,
@@ -52,8 +58,8 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 		server,
 		ch,
 		doneCh,
-		float32(10),
-		float32(10),
+		float32(position[0]),
+		float32(position[1]),
 		fullLife,
 		defaultDirection,
 		defaultTankSpeed,

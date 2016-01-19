@@ -210,7 +210,7 @@ func (s *Server) Listen() {
 			}
 		}()
 
-		client := NewClient(ws, s)
+		client := NewClient(ws, s, len(s.clients))
 		s.Add(client)
 		client.Listen()
 	}
