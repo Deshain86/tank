@@ -19,7 +19,7 @@
     var dy = 5;
     var tankWidth = 37;
     var tankHeight = 35;
-	var bulletWidth = 6;
+	  var bulletWidth = 6;
     var bulletHeight = 14;
 
     var x = 0;
@@ -29,12 +29,10 @@
     var WIDTH = 800;
     var HEIGHT = 800;
     var bulletSpeed = 6;
-    var refreshrate = 60;
-    var serverRefreshrate = 15;
-    var orgtimes = refreshrate / serverRefreshrate;
+    var refreshrate = 30;
 	
-	var envWidth = 128;
-	var envHeight = 128;
+  	var envWidth = 128;
+  	var envHeight = 128;
 
     var keySpacePressed = false;
     var keyUpPressed = false;
@@ -83,59 +81,6 @@
         for (k in datalist) {
           parseLine(datalist[k]);
         }
-        var times = refreshrate / serverRefreshrate;
-
-        
-        var myVar = setInterval(function(){
-          if(orgtimes == times)
-          {
-            draw();
-          }
-          else
-          {
-            for (k in users) {
-              switch (users[k].direction) {
-                case 0:
-                  users[k].posY = users[k].posY - users[k].speed
-                  if (users[k].posY <= 0) {
-                    users[k].posY = 0
-                  }
-                  break;
-                case 90:
-                  users[k].posX = users[k].posX + users[k].speed
-                  if (users[k].posX+tankHeight >= WIDTH) {
-                    users[k].posX = WIDTH - tankHeight
-                  }
-                  break;
-                case 180:
-                  users[k].posY = users[k].posY + users[k].speed
-                  if (users[k].posY+tankHeight >= HEIGHT) {
-                    users[k].posY = HEIGHT - tankHeight
-                  }
-                  break;
-                case 270:
-                  users[k].posX = users[k].posX - users[k].speed
-                  if (users[k].posX <= 0) {
-                    users[k].posX = 0
-                  }
-                  break;
-              }
-            }
-            draw();
-          }
-          
-          if(times == 1)
-          {
-            clearInterval(myVar);
-          }
-          times--;
-          
-        },(1000/refreshrate));
-        // draw();
-        // for (var i=0; i < (refreshrate / serverRefreshrate); i++)
-        // {
-          
-        // }
       };
 
       function parseLine(line){
@@ -154,9 +99,9 @@
               break;
             case 'B':
               bullets.push({
-                posX: parseInt(data[1]), 
-                posY: parseInt(data[2]), 
-                direction: parseInt(data[3])});
+                posX: parseFloat(data[1]), 
+                posY: parseFloat(data[2]), 
+                direction: parseFloat(data[3])});
               break;
           }
         }
@@ -232,7 +177,7 @@
       }
       
       // and restore the co-ords to how they were when we began
-      ctx.restore(); 
+      ctx.restore(refreshrate); 
     }
 
       function clear() {
@@ -253,15 +198,16 @@
         barrelImages.push(brl);
       }
 	
-	  var bul = new Image();
+	    var bul = new Image();
       bul.src = bulletPath + bulletList[0];
       bulletImages.push(bul);
 	
-	  for (var i = 0; i < envGroundList.length; i++) {
-		var env = new Image();
-		env.src = envPath + envGroundList[i]
-		envImages.push(env);
-	  }
+  	  for (var i = 0; i < envGroundList.length; i++) {
+    		var env = new Image();
+    		env.src = envPath + envGroundList[i]
+    		envImages.push(env);
+    	}
+      setInterval(draw, 1000/refreshrate);
     }
 
     function websocketAction(action){
