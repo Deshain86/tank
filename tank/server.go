@@ -140,7 +140,7 @@ func (s *Server) sendAll() {
 	for _, c := range s.clients {
 		if c.Fire {
 			if c.LastFire == 0 {
-				c.LastFire = 5
+				c.LastFire = 20 * int(refreshModifier)
 				s.bullets = append(s.bullets,
 					&Bullet{
 						x:         c.PositionX + tankWidthHalf - bulletWidthHalf,
