@@ -24,9 +24,9 @@ type User struct {
 	Direction int
 }
 
-func (self *Server) ParseResponse(msg *Message, clientId int) {
+func (self *Server) ParseResponse(msg *string, clientId int) {
 	tmp := self.clients[clientId] // users[clientId]
-	switch msg.Body {
+	switch *msg {
 	case "fire":
 		tmp.Fire = true
 	case "fire2":

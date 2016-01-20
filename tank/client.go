@@ -129,9 +129,8 @@ func (c *Client) listenRead() {
 
 		// read data from websocket connection
 		default:
-			var msg Message
-
-			err := websocket.JSON.Receive(c.ws, &msg)
+			var msg string
+			err := websocket.Message.Receive(c.ws, &msg)
 			if err == io.EOF {
 				c.doneCh <- true
 			} else if err != nil {

@@ -210,10 +210,9 @@
       setInterval(draw, 1000/refreshrate);
     }
 
-    function websocketAction(action){
-      websocket.send(JSON.stringify({
-        body: action
-      }));
+    function websocketAction(action)
+    {
+      websocket.send(action);
     }
 
     function doKeyDown(evt){
