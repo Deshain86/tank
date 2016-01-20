@@ -44,7 +44,7 @@ forLoop:
 	s.bullets = newList
 }
 
-func (s *Server) checkHitBullet(clientId int, tankX1, tankY1, tankX2, tankY2 float32) bool {
+func (s *Server) checkHitBullet(clientId int, tankX1, tankY1, tankX2, tankY2 float32) (bool, int) {
 	for k, b := range s.bullets {
 		if b.ownerId != clientId {
 			if (tankX2 > b.x && tankX1 < b.x) && (tankY2 > b.y && tankY1 < b.y) {
@@ -55,9 +55,9 @@ func (s *Server) checkHitBullet(clientId int, tankX1, tankY1, tankX2, tankY2 flo
 					}
 				}
 				s.bullets = tmpList
-				return true
+				return true, b.ownerId
 			}
 		}
 	}
-	return false
+	return false, 0
 }

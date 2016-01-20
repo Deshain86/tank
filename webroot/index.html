@@ -6,12 +6,12 @@
 </head>
 <body>
   <section>
-      <div>
+    <div id="score" style="float:right;font-weight:bold;font-size:105px;text-align:center;width:40%"></div>
+    <div>
         <canvas id="canvas" width="800" height="800">
       This text is displayed if your browser does not support HTML5 Canvas.
         </canvas>
     </div>
-    
       <script type="text/javascript">
     var canvas;
     var ctx;
@@ -30,6 +30,7 @@
     var HEIGHT = 800;
     var bulletSpeed = 6;
     var refreshrate = 30;
+    var scores = false;
 	
   	var envWidth = 128;
   	var envHeight = 128;
@@ -78,6 +79,7 @@
         // y = 10;
         users = [];
         bullets = [];
+        scores = false;
         for (k in datalist) {
           parseLine(datalist[k]);
         }
@@ -102,6 +104,17 @@
                 posX: parseFloat(data[1]), 
                 posY: parseFloat(data[2]), 
                 direction: parseFloat(data[3])});
+              break;
+            case 'S':
+              score = document.getElementById("score");
+              var str = '';
+              if (scores == true)
+              {
+                str = score.innerHTML;
+              }
+              scores = true
+              str += data[1] + " - " + data[2] + "<br />";
+              score.innerHTML = str;
               break;
           }
         }

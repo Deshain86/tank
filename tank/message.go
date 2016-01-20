@@ -1,6 +1,7 @@
 package tank
 
 import (
+	"bytes"
 	"fmt"
 )
 
@@ -55,10 +56,10 @@ func (self *Server) ParseResponse(msg *string, clientId int) {
 }
 
 func (self *Server) BuildAnswer(clientId int) string {
-	var result string
+	var result bytes.Buffer
 	for _, u := range self.bullets {
-		result += fmt.Sprintf("B;%.0f;%.0f;%d;\n",
-			u.x, u.y, u.direction)
+		result.WriteString(fmt.Sprintf("B;%.0f;%.0f;%d;\n",
+			u.x, u.y, u.direction))
 	}
 	for _, user := range self.clients {
 		color := "r"
@@ -66,11 +67,16 @@ func (self *Server) BuildAnswer(clientId int) string {
 			color = "b"
 		}
 
-		result += fmt.Sprintf("T;%d;%s;%.0f;%.0f;%.0f;%d;%d;%d;\n",
-			user.id, color, user.PositionX, user.PositionY, user.Speed, user.Direction, user.Direction, 100)
+		result.WriteString(fmt.Sprintf("T;%d;%s;%.0f;%.0f;%.0f;%d;%d;%d;\n",
+			user.id, color, user.PositionX, user.PositionY, user.Speed, user.Direction, user.Direction, 100))
+	}
+	if self.score.change {
+		for id, point := range self.score.client {
+			result.WriteString(fmt.Sprintf("S;%d;%d;\n", id, point))
+		}
 	}
 
-	return result
+	return result.String()
 }
 
 /*

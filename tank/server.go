@@ -21,6 +21,7 @@ type Server struct {
 	sendAllCh chan *Message
 	doneCh    chan bool
 	errCh     chan error
+	score     Scores
 }
 
 // Create new chat server.
@@ -33,6 +34,8 @@ func NewServer(pattern string, mod float32) *Server {
 	sendAllCh := make(chan *Message)
 	doneCh := make(chan bool)
 	errCh := make(chan error)
+	var score Scores
+	score.client = make(map[int]int)
 	refreshModifier = mod
 
 	return &Server{
@@ -45,6 +48,7 @@ func NewServer(pattern string, mod float32) *Server {
 		sendAllCh,
 		doneCh,
 		errCh,
+		score,
 	}
 }
 
@@ -75,6 +79,7 @@ func (s *Server) sendAll() {
 		m := s.BuildAnswer(c.id)
 		c.Write(&m)
 	}
+	s.scoreRead()
 }
 
 func (s *Server) RunInterval(ticker *time.Ticker) {

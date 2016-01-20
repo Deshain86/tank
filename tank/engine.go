@@ -10,10 +10,11 @@ func (s *Server) calcAll() {
 
 forLoop:
 	for _, c := range s.clients {
-
-		if s.checkHitTank(c) {
+		hit, hitClientId := s.checkHitTank(c)
+		if hit {
 			c.PositionX = c.StartPosX
 			c.PositionY = c.StartPosY
+			s.scoreAdd(hitClientId)
 			m := s.BuildAnswer(c.id)
 			c.Write(&m)
 			continue forLoop
