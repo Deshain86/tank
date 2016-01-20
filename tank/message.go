@@ -24,7 +24,6 @@ type User struct {
 	Direction int
 }
 
-// func (self *Message) ParseResponse(clientId int) {
 func (self *Server) ParseResponse(msg *Message, clientId int) {
 	tmp := self.clients[clientId] // users[clientId]
 	switch msg.Body {

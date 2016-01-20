@@ -35,6 +35,8 @@ type Client struct {
 	Moving    bool
 	Fire      bool
 	LastFire  int
+	StartPosX float32
+	StartPosY float32
 }
 
 // Create new chat client.
@@ -65,7 +67,9 @@ func NewClient(ws *websocket.Conn, server *Server, id int) *Client {
 		defaultTankSpeed,
 		false,
 		false,
-		0}
+		0,
+		float32(position[0]),
+		float32(position[1])}
 }
 
 func (c *Client) Conn() *websocket.Conn {
@@ -82,9 +86,9 @@ func (c *Client) Write(ans *string) {
 	}
 }
 
-func (c *Client) Done() {
-	c.doneCh <- true
-}
+// func (c *Client) Done() {
+// 	c.doneCh <- true
+// }
 
 // Listen Write and Read request via chanel
 func (c *Client) Listen() {
@@ -126,6 +130,7 @@ func (c *Client) listenRead() {
 		// read data from websocket connection
 		default:
 			var msg Message
+
 			err := websocket.JSON.Receive(c.ws, &msg)
 			if err == io.EOF {
 				c.doneCh <- true
@@ -133,7 +138,7 @@ func (c *Client) listenRead() {
 				c.server.Err(err)
 			} else {
 				log.Print("MSG ", msg)
-				c.server.SendAll(&msg, c.id)
+				c.server.ParseResponse(&msg, c.id)
 			}
 		}
 	}
