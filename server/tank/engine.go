@@ -10,6 +10,7 @@ forLoop:
 	for _, c := range s.clients {
 		hit, hitClientId := s.checkHitTank(c)
 		if hit {
+			s.explosionAdd(c.PositionX, c.PositionY)
 			c.PositionX = c.StartPosX
 			c.PositionY = c.StartPosY
 			s.scoreAdd(hitClientId)
@@ -33,8 +34,11 @@ forLoop:
 			c.LastFire--
 		}
 
-		var speed = c.Speed * refreshModifier
+		// var speed = c.Speed * refreshModifier
 		if c.Moving {
+			var speed = s.setSpeedTank(c, refreshModifier)
+			newPositionX := c.PositionX
+			newPositionY := c.PositionY
 			switch c.Direction {
 			case 0:
 				c.PositionY = c.PositionY - speed
@@ -57,6 +61,7 @@ forLoop:
 					c.PositionX = 0
 				}
 			}
+			s.checkColision(c, newPositionX, newPositionY)
 		}
 	}
 }
