@@ -16,18 +16,21 @@ type Server struct {
 	messages  []*Message
 	clients   map[int]*Client
 	bullets   []*Bullet
+	explosion Explosion
 	addCh     chan *Client
 	delCh     chan *Client
 	sendAllCh chan *Message
 	doneCh    chan bool
 	errCh     chan error
 	score     Scores
+	mapa      *mapa
 }
 
 // Create new chat server.
 func NewServer(pattern string, mod float32) *Server {
 	var bullets []*Bullet
 	messages := []*Message{}
+	explosion := Explosion{}
 	clients := make(map[int]*Client)
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
@@ -37,19 +40,25 @@ func NewServer(pattern string, mod float32) *Server {
 	var score Scores
 	score.client = make(map[int]int)
 	refreshModifier = mod
+	m := &mapa{}
 
-	return &Server{
+	s := &Server{
 		pattern,
 		messages,
 		clients,
 		bullets,
+		explosion,
 		addCh,
 		delCh,
 		sendAllCh,
 		doneCh,
 		errCh,
 		score,
+		m,
 	}
+
+	s.setMap()
+	return s
 }
 
 func (s *Server) Add(c *Client) {

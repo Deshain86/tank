@@ -3,8 +3,6 @@ package tank
 const canvasSizeX float32 = 800
 const canvasSizeY float32 = 800
 
-const defaultTankSpeed float32 = 2
-
 func (s *Server) calcAll() {
 	s.checkBulletsOnMap(canvasSizeX, canvasSizeY, refreshModifier)
 
