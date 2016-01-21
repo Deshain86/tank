@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Client Test</title>
+</head>
+<body>
+  <section>
+    <h1> Testing this biatch!</h1>
+    <div id="test">
+    </div>
+    <script type="text/javascript">
+      var websocket = new WebSocket("ws://localhost:8080/echo");
+      websocket.onmessage = function(str)
+      {
+        document.getElementById('test').innerHTML += str.data + "<br />";
+      };
+
+      function websocketAction(action)
+      {
+        websocket.send(action);
+      }
+
+      function doKeyDown(evt)
+      {
+        switch (evt.keyCode)
+        {
+          case 32:
+            websocketAction('fire');
+            break;
+          case 38:
+            websocketAction("up");
+          break;
+          case 40:  /* Down arrow */
+            websocketAction("down");
+          break;
+          case 37:  /* Left arrow was pressed */
+            websocketAction("left");
+          break;
+          case 39:  /* Right arrow was pressed */
+            websocketAction("right");
+          break;
+        }
+      }
+
+      function doKeyUp(evt){
+        var direction;
+        switch (evt.keyCode)
+         {
+          case 32:
+            websocketAction('fire2');
+          break;
+          case 38:
+            direction = "up2";
+          break;
+          case 40:  /* Down arrow was pressed */
+            direction = "down2";
+          break;
+          case 37:  /* Left arrow was pressed */
+            direction = "left2";
+          break;
+          case 39:  /* Right arrow was pressed */
+            direction = "right2";
+          break;
+        }
+        websocketAction(direction);
+      }
+
+      window.addEventListener('keydown',doKeyDown, true);
+      window.addEventListener('keyup', doKeyUp, true);
+      </script>
+    </section>
+</body>
+</html>
