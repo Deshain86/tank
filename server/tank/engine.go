@@ -41,24 +41,24 @@ forLoop:
 			newPositionY := c.PositionY
 			switch c.Direction {
 			case 0:
-				c.PositionY = c.PositionY - speed
-				if c.PositionY <= 0 {
-					c.PositionY = 0
+				newPositionY = c.PositionY - speed
+				if newPositionY <= 0 {
+					newPositionY = 0
 				}
 			case 90:
-				c.PositionX = c.PositionX + speed
-				if c.PositionX+tankHeight >= canvasSizeX {
-					c.PositionX = canvasSizeX - tankHeight
+				newPositionX = c.PositionX + speed
+				if newPositionX+tankHeight >= canvasSizeX {
+					newPositionX = canvasSizeX - tankHeight
 				}
 			case 180:
-				c.PositionY = c.PositionY + speed
-				if c.PositionY+tankHeight >= canvasSizeY {
-					c.PositionY = canvasSizeY - tankHeight
+				newPositionY = c.PositionY + speed
+				if newPositionY+tankHeight >= canvasSizeY {
+					newPositionY = canvasSizeY - tankHeight
 				}
 			case 270:
-				c.PositionX = c.PositionX - speed
-				if c.PositionX <= 0 {
-					c.PositionX = 0
+				newPositionX = c.PositionX - speed
+				if newPositionX <= 0 {
+					newPositionX = 0
 				}
 			}
 			s.checkColision(c, newPositionX, newPositionY)
