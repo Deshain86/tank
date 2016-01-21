@@ -23,6 +23,7 @@ type Server struct {
 	doneCh    chan bool
 	errCh     chan error
 	score     Scores
+	mapa      *mapa
 }
 
 // Create new chat server.
@@ -39,8 +40,9 @@ func NewServer(pattern string, mod float32) *Server {
 	var score Scores
 	score.client = make(map[int]int)
 	refreshModifier = mod
+	m := &mapa{}
 
-	return &Server{
+	s := &Server{
 		pattern,
 		messages,
 		clients,
@@ -52,7 +54,11 @@ func NewServer(pattern string, mod float32) *Server {
 		doneCh,
 		errCh,
 		score,
+		m,
 	}
+
+	s.setMap()
+	return s
 }
 
 func (s *Server) Add(c *Client) {
