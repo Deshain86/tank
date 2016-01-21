@@ -75,6 +75,11 @@ func (self *Server) BuildAnswer(clientId int) string {
 			result.WriteString(fmt.Sprintf("S;%d;%d;\n", id, point))
 		}
 	}
+	if self.explosion.show {
+		for _, point := range self.explosion.position {
+			result.WriteString(fmt.Sprintf("E;%.0f;%.0f;\n", point.x, point.y))
+		}
+	}
 
 	return result.String()
 }

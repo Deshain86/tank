@@ -12,6 +12,7 @@ forLoop:
 	for _, c := range s.clients {
 		hit, hitClientId := s.checkHitTank(c)
 		if hit {
+			s.explosionAdd(c.PositionX, c.PositionY)
 			c.PositionX = c.StartPosX
 			c.PositionY = c.StartPosY
 			s.scoreAdd(hitClientId)
