@@ -21,8 +21,5 @@ func main() {
 	ticker := time.NewTicker(time.Second / 30)
 	go server.RunInterval(ticker)
 
-	// static files
-	http.Handle("/", http.FileServer(http.Dir("webroot")))
-
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
