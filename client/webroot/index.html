@@ -120,7 +120,7 @@
               score.innerHTML = str;
               break;
             case 'E':
-              smokeList.push(Sprite({
+              var smoke = Sprite({
                 context: ctx,
                 width: 750,
                 height: 75,
@@ -128,7 +128,9 @@
                 numberOfFrames: 10,
                 x: parseFloat(data[1]),
                 y: parseFloat(data[2])
-              }));
+              });
+              smokeList.push(smoke);
+              smokeList[smokeList.length - 1].render();
               break;
           }
         }
