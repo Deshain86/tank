@@ -81,6 +81,11 @@ func (self *Server) BuildAnswer(clientId int, firstAnswer bool) string {
 		result.WriteString(fmt.Sprintf("T;%d;%s;%.0f;%.0f;%.0f;%d;%d;%d;\n",
 			user.id, color, user.PositionX, user.PositionY, user.Speed, user.Direction, user.Direction, 100))
 	}
+	if self.explosion.show {
+		for _, point := range self.explosion.position {
+			result.WriteString(fmt.Sprintf("E;%.0f;%.0f;\n", point.x, point.y))
+		}
+	}
 	if self.score.change {
 		for id, point := range self.score.client {
 			result.WriteString(fmt.Sprintf("S;%d;%d;\n", id, point))

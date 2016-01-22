@@ -89,6 +89,7 @@ func (s *Server) sendAll() {
 		c.Write(&m)
 	}
 	s.scoreRead()
+	s.explosionRead()
 }
 
 func (s *Server) RunInterval(ticker *time.Ticker) {

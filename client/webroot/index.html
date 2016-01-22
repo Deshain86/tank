@@ -140,15 +140,14 @@
             case 'E':
               var smoke = Sprite({
                 context: ctx,
-                width: 750,
-                height: 75,
+                width: 1280,
+                height: 128,
                 image: smokeImage,
                 numberOfFrames: 10,
                 x: parseFloat(data[1]),
                 y: parseFloat(data[2])
               });
               smokeList.push(smoke);
-              smokeList[smokeList.length - 1].render();
               break;
           }
         }
@@ -308,7 +307,7 @@
     		envImages.push(env);
     	}
 
-      smokeImage.src = "./resources/Smoke/smoke.png";
+      smokeImage.src = "./resources/Smoke/smoke2.png";
 
       setInterval(draw, 1000/refreshrate);
       //setInterval(generateRandomSmoke, 500);
@@ -317,8 +316,8 @@
     function generateRandomSmoke() {
       var smoke = Sprite({
         context: ctx,
-        width: 750,
-        height: 75,
+        width: 1280,
+        height: 128,
         image: smokeImage,
         numberOfFrames: 10,
         x: Math.floor((Math.random() * 800) + 1),
@@ -326,7 +325,6 @@
       });
 
       smokeList.push(smoke);
-      smokeList[smokeList.length - 1].render();
     }
 
     function websocketAction(action)
@@ -456,11 +454,11 @@
 
       for (k in smokeList) {
         if (smokeList[k].destroy === true) {
-          smokeList.splice(k, 1);
+          //smokeList.splice(k, 1);
           continue;
         }
-        smokeList[k].update();
         smokeList[k].render();
+        smokeList[k].update();
       }
     }
 
