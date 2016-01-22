@@ -119,16 +119,17 @@
               str += data[1] + " - " + data[2] + "<br />";
               score.innerHTML = str;
               break;
-            // case 'E':
-            //   smokeList.push(Sprite({
-            //     context: ctx,
-            //     width: 750,
-            //     height: 75,
-            //     image: smokeImage,
-            //     numberOfFrames: 10,
-            //     x: parseFloat(data[1]),
-            //     y: parseFloat(data[2])
-            //   }));
+            case 'E':
+              smokeList.push(Sprite({
+                context: ctx,
+                width: 750,
+                height: 75,
+                image: smokeImage,
+                numberOfFrames: 10,
+                x: parseFloat(data[1]),
+                y: parseFloat(data[2])
+              }));
+              break;
           }
         }
       }
@@ -290,7 +291,7 @@
       smokeImage.src = "./resources/Smoke/smoke.png";
 
       setInterval(draw, 1000/refreshrate);
-      setInterval(generateRandomSmoke, 500);
+      //setInterval(generateRandomSmoke, 500);
     }
 
     function generateRandomSmoke() {
