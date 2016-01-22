@@ -57,7 +57,7 @@ func NewServer(pattern string, mod float32) *Server {
 		m,
 	}
 
-	s.setMap()
+	s.mapa.setMap()
 	return s
 }
 
@@ -78,14 +78,14 @@ func (s *Server) Err(err error) {
 }
 
 func (s *Server) sendPastMessages(c *Client) {
-	x := s.BuildAnswer(c.id)
+	x := s.BuildAnswer(c.id, true)
 	c.Write(&x)
 }
 
 func (s *Server) sendAll() {
 	s.calcAll()
 	for _, c := range s.clients {
-		m := s.BuildAnswer(c.id)
+		m := s.BuildAnswer(c.id, false)
 		c.Write(&m)
 	}
 	s.scoreRead()

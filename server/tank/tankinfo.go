@@ -16,11 +16,11 @@ func (s *Server) checkHitTank(c *Client) (bool, int) {
 }
 
 func (s *Server) setSpeedTank(c *Client, refreshTime float32) float32 {
-	return c.Speed * refreshTime * s.getSpeedPosition(c.PositionX, c.PositionY)
+	return c.Speed * refreshTime * s.getSpeedPosition(c.PositionX+tankWidthHalf, c.PositionY+tankHeightHalf)
 }
 
 func (s *Server) checkColision(c *Client, newX, newY float32) {
-	if s.getCollision(newX, newY) {
+	if s.getCollision(newX+tankWidthHalf, newY+tankHeightHalf) {
 		return
 	}
 	c.PositionX = newX

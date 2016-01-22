@@ -32,8 +32,8 @@
     var refreshrate = 30;
     var scores = false;
 	
-  	var envWidth = 128;
-  	var envHeight = 128;
+  	var envWidth = 256;
+  	var envHeight = 256;
 
     var keySpacePressed = false;
     var keyUpPressed = false;
@@ -53,14 +53,23 @@
 	var envPath = "./resources/Environment/";
 	var envGroundList = ["dirt.png", "sand.png", "grass.png", "waterShallow.png", "waterDeep.png"];
 	var envObstacleList = ["treeLarge.png", "treeSmall.png"];
-	var envMap = [0, 0, 1, 2, 0, 0, 0, 1,
-		1, 1, 2, 2, 1, 1, 2, 2,
-		1, 0, 0, 0, 2, 2, 2, 2,
-		0, 0, 1, 3, 3, 0, 0, 1,
-		1, 0, 0, 3, 2, 2, 2, 2,
-		1, 1, 2, 2, 1, 1, 2, 2,
-		0, 0, 0, 4, 1, 0, 0, 1,
-		0, 0, 0, 4, 0, 0, 0, 0];
+	var envMap = [];
+    // 0, 0, 1, 2, 0, 0, 0, 1, 0, 0, 1, 2, 0, 0, 0, 1,
+    // 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2,
+    // 1, 0, 0, 0, 2, 2, 2, 2, 1, 0, 0, 0, 2, 2, 2, 2,
+    // 0, 0, 1, 3, 3, 0, 0, 1, 0, 0, 1, 3, 3, 0, 0, 1,
+    // 1, 0, 0, 3, 2, 2, 2, 2, 1, 0, 0, 3, 2, 2, 2, 2,
+    // 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2,
+    // 0, 0, 0, 4, 1, 0, 0, 1, 0, 0, 0, 4, 1, 0, 0, 1,
+    // 4, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    // 0, 0, 1, 2, 0, 0, 0, 1, 0, 0, 1, 2, 0, 0, 0, 1,
+    // 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2,
+    // 1, 0, 0, 0, 2, 2, 2, 2, 1, 0, 0, 0, 2, 2, 2, 2,
+    // 0, 0, 1, 3, 3, 0, 0, 1, 0, 0, 1, 3, 3, 0, 0, 1,
+    // 1, 0, 0, 3, 2, 2, 2, 2, 1, 0, 0, 3, 2, 2, 2, 2,
+    // 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2,
+    // 0, 0, 0, 4, 1, 0, 0, 1, 0, 0, 0, 4, 1, 0, 0, 1,
+    // 4, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     
     var tanksImages = [];
     var barrelImages = [];
@@ -108,6 +117,15 @@
                 posY: parseFloat(data[2]), 
                 direction: parseFloat(data[3])});
               break;
+            case 'M':
+              for (k in data)
+              {
+                if(k != 0 && data[k] != '')
+                {
+                  envMap.push(data[k])
+                }
+              }
+              break;
             case 'S':
               score = document.getElementById("score");
               var str = '';
@@ -141,13 +159,13 @@
 		var startY = 0;
 		
 		for (var i = 0; i < envMap.length; i++) {
-			if (i > 0 && i % 8 == 0) {
+			if (i > 0 && i % 16 == 0) {
 				startX = 0;
-				startY += 100;
+				startY += 50;
 			}
 			
 			ctx.drawImage(envImages[envMap[i]], 0, 0, envWidth, envHeight, startX, startY, 100, 100);
-			startX += 100;
+			startX += 50;
 		}
 	}
 

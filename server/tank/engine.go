@@ -2,6 +2,8 @@ package tank
 
 const canvasSizeX float32 = 800
 const canvasSizeY float32 = 800
+const canvasMapX float32 = 16
+const canvasMapY float32 = 16
 
 func (s *Server) calcAll() {
 	s.checkBulletsOnMap(canvasSizeX, canvasSizeY, refreshModifier)
@@ -14,7 +16,7 @@ forLoop:
 			c.PositionX = c.StartPosX
 			c.PositionY = c.StartPosY
 			s.scoreAdd(hitClientId)
-			m := s.BuildAnswer(c.id)
+			m := s.BuildAnswer(c.id, false)
 			c.Write(&m)
 			continue forLoop
 		}

@@ -3,6 +3,7 @@ package tank
 import (
 	"bytes"
 	"fmt"
+	"strconv"
 )
 
 type Message struct {
@@ -55,8 +56,18 @@ func (self *Server) ParseResponse(msg *string, clientId int) {
 	self.clients[clientId] = tmp
 }
 
-func (self *Server) BuildAnswer(clientId int) string {
+func (self *Server) BuildAnswer(clientId int, firstAnswer bool) string {
 	var result bytes.Buffer
+	if firstAnswer {
+		x := self.mapa.drawMap()
+		for _, v := range x {
+			result.WriteString("M;")
+			for _, v2 := range v {
+				result.WriteString(strconv.Itoa(v2) + ";")
+			}
+			result.WriteString("\n")
+		}
+	}
 	for _, u := range self.bullets {
 		result.WriteString(fmt.Sprintf("B;%.0f;%.0f;%d;\n",
 			u.x, u.y, u.direction))
@@ -75,7 +86,6 @@ func (self *Server) BuildAnswer(clientId int) string {
 			result.WriteString(fmt.Sprintf("S;%d;%d;\n", id, point))
 		}
 	}
-
 	return result.String()
 }
 
