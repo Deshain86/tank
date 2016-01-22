@@ -68,6 +68,9 @@
 	var envImages = [];
 	
     var pressed = [];
+
+    var smokeImage = new Image();
+    var smokeList = [];
     
     var lastPressed = "u";
         var websocket = new WebSocket("ws://localhost:8080/entry");
@@ -116,6 +119,16 @@
               str += data[1] + " - " + data[2] + "<br />";
               score.innerHTML = str;
               break;
+            // case 'E':
+            //   smokeList.push(Sprite({
+            //     context: ctx,
+            //     width: 750,
+            //     height: 75,
+            //     image: smokeImage,
+            //     numberOfFrames: 10,
+            //     x: parseFloat(data[1]),
+            //     y: parseFloat(data[2])
+            //   }));
           }
         }
       }
@@ -134,6 +147,59 @@
 			startX += 100;
 		}
 	}
+
+  // ========================================================
+        function Sprite (options) {
+          var obj = {};
+                
+          obj.context = options.context;
+          obj.width = options.width;
+          obj.height = options.height;
+          obj.image = options.image;
+          obj.x = options.x;
+          obj.y = options.y;
+
+          obj.frameIndex = 0;
+          obj.tickCount = 0;
+          obj.ticksPerFrame = 2;
+          obj.numberOfFrames = options.numberOfFrames || 1;
+
+          obj.destroy = false;
+
+          obj.render = function () {
+            // Draw the animation
+            obj.context.drawImage(
+              obj.image,
+              obj.frameIndex * obj.width / obj.numberOfFrames,
+              0,
+              obj.width / obj.numberOfFrames,
+              obj.height,
+              obj.x - (obj.height / 2),
+              obj.y - (obj.height / 2),
+              obj.width / obj.numberOfFrames,
+              obj.height);
+          };
+
+          obj.update = function () {
+            obj.tickCount += 1;
+      
+            if (obj.tickCount > obj.ticksPerFrame) {
+              obj.tickCount = 0;
+          
+              // If the current frame index is in range
+              if (obj.frameIndex < obj.numberOfFrames - 1) {  
+                // Go to the next frame
+                obj.frameIndex += 1;
+              } else {
+                obj.destroy = true;
+              }
+            }
+          };
+
+          return obj;
+        }
+
+        // ========================================================
 
     function rect(x, y, w, h, stroke) {
       ctx.beginPath();
@@ -220,7 +286,26 @@
     		env.src = envPath + envGroundList[i]
     		envImages.push(env);
     	}
+
+      smokeImage.src = "./resources/Smoke/smoke.png";
+
       setInterval(draw, 1000/refreshrate);
+      setInterval(generateRandomSmoke, 500);
+    }
+
+    function generateRandomSmoke() {
+      var smoke = Sprite({
+        context: ctx,
+        width: 750,
+        height: 75,
+        image: smokeImage,
+        numberOfFrames: 10,
+        x: Math.floor((Math.random() * 800) + 1),
+        y: Math.floor((Math.random() * 800) + 1)
+      });
+
+      smokeList.push(smoke);
+      smokeList[smokeList.length - 1].render();
     }
 
     function websocketAction(action)
@@ -347,10 +432,15 @@
       for (k in users) {
         drawObject("tank", users[k].posX, users[k].posY, tankWidth, tankHeight, users[k].color, users[k].direction);
       }
-      
-      //for (k in bullets) {
-      //  drawObject("bullet", bullets[k].posX, bullets[k].posY, bulletWidth, bulletHeight, bullets[k].color, bullets[k].direction);
-      //}
+
+      for (k in smokeList) {
+        if (smokeList[k].destroy === true) {
+          smokeList.splice(k, 1);
+          continue;
+        }
+        smokeList[k].update();
+        smokeList[k].render();
+      }
     }
 
       init();
