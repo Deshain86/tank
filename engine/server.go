@@ -6,9 +6,8 @@ var refreshModifier float32 = 1
 
 // Chat server.
 type Server struct {
-	//	pattern   string
 	messages  []*Message
-	clients   map[int]*Client
+	clients   map[string]*Client
 	bullets   []*Bullet
 	explosion Explosion
 	addCh     chan *Client
@@ -25,7 +24,7 @@ func NewServer() *Server {
 	var bullets []*Bullet
 	messages := []*Message{}
 	explosion := Explosion{}
-	clients := make(map[int]*Client)
+	clients := make(map[string]*Client)
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
 	sendAllCh := make(chan *Message)
@@ -37,7 +36,6 @@ func NewServer() *Server {
 	m := &mapa{}
 
 	s := &Server{
-		//		pattern,
 		messages,
 		clients,
 		bullets,
@@ -91,14 +89,14 @@ func (s *Server) Listen() {
 		// Add new a client
 		case c := <-s.addCh:
 			log.Println("Added new client")
-			s.clients[c.id] = c
+			s.clients[c.RemoteAddrStr] = c
 			log.Println("Now", len(s.clients), "clients connected.")
 			s.sendPastMessages(c)
 
 		// del a client
 		case c := <-s.delCh:
 			log.Println("Delete client")
-			delete(s.clients, c.id)
+			delete(s.clients, c.RemoteAddrStr)
 
 		case err := <-s.errCh:
 			log.Println("Error:", err.Error())

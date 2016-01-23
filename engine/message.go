@@ -3,6 +3,7 @@ package engine
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"strconv"
 )
 
@@ -26,9 +27,13 @@ type User struct {
 	Direction int
 }
 
-func (self *Server) ParseResponse(msg *string, clientId int) {
+func (self *Server) ParseResponse(msg string, clientId string) {
 	tmp := self.clients[clientId] // users[clientId]
-	switch *msg {
+	if tmp == nil {
+		log.Print("brak uzytkownika ", clientId)
+		return
+	}
+	switch msg {
 	case "fire":
 		tmp.Fire = true
 	case "fire2":
@@ -53,6 +58,7 @@ func (self *Server) ParseResponse(msg *string, clientId int) {
 		tmp.Moving = false
 		tmp.Speed = 0
 	}
+
 	self.clients[clientId] = tmp
 }
 

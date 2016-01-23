@@ -42,14 +42,11 @@ func main() {
 		tmp := strings.Split(string(msg[:n]), ":")
 		switch string(tmp[0]) {
 		case "login":
-
 			client := server.NewClient(remoteaddr)
 			server.Add(client)
 			sendResponse(ser, remoteaddr, strconv.Itoa(client.GetId()))
-			//		case "up":
-			//			sendResponse(ser, remoteaddr, server.SendAll())
 		default:
-			sendResponse(ser, remoteaddr, "YO")
+			server.ParseResponse(tmp[0], remoteaddr.String())
 		}
 	}
 }

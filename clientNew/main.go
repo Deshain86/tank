@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"net"
@@ -20,7 +19,7 @@ func sendMessage(msg []byte) []byte {
 	_, err := conn.Write(msg)
 	CheckError(err)
 	msgFromServer := make([]byte, 2048)
-	bufio.NewReader(conn).Read(msgFromServer)
+	//	bufio.NewReader(conn).Read(msgFromServer)
 	return msgFromServer
 }
 

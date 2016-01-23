@@ -19,21 +19,22 @@ var firstPosition [][]float32 = [][]float32{
 	[]float32{canvasSizeX - 100, 50}}
 
 type Client struct {
-	id        int
-	ws        *net.UDPAddr
-	server    *Server
-	ch        chan *string
-	doneCh    chan bool
-	PositionX float32
-	PositionY float32
-	Life      int
-	Direction int
-	Speed     float32
-	Moving    bool
-	Fire      bool
-	LastFire  int
-	StartPosX float32
-	StartPosY float32
+	id            int
+	RemoteAddr    *net.UDPAddr
+	RemoteAddrStr string
+	server        *Server
+	ch            chan *string
+	doneCh        chan bool
+	PositionX     float32
+	PositionY     float32
+	Life          int
+	Direction     int
+	Speed         float32
+	Moving        bool
+	Fire          bool
+	LastFire      int
+	StartPosX     float32
+	StartPosY     float32
 }
 
 // Create new chat client.
@@ -50,6 +51,7 @@ func (server *Server) NewClient(remoteAddr *net.UDPAddr) *Client {
 	return &Client{
 		maxId,
 		remoteAddr,
+		remoteAddr.String(),
 		server,
 		ch,
 		doneCh,
