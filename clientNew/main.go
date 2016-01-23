@@ -41,18 +41,21 @@ func manageMessages() {
 func manageWebSocket(ws *websocket.Conn) {
 	for {
 		serverMessage := <-serverMsg
-		serverMessageString := strings.Split(string(serverMessage), ";")
+		serverMessageString := strings.SplitN(string(serverMessage), ";", 3)
 		log.Println(serverMessageString)
 		log.Println(waitingRequests)
-		if len(serverMessageString) >= 3 {
+		if len(serverMessageString) == 3 {
 			switch serverMessageString[1] {
 				case  "LOGIN":
-				key, err := strconv.ParseInt(serverMessageString[3], 10, 32)
+				idKey := strings.SplitN(string(serverMessageString[2]), ";", 2)
+				idString := idKey[0]
+				keyString := idKey[1]
+				key, err := strconv.ParseInt(keyString, 10, 32)
 				log.Println(key)
 				CheckError(err)
 				if waitingRequests[int32(key)] != nil {
 					waitingRequestsArray := strings.Split(string(waitingRequests[int32(key)]),";")
-					id, err := strconv.Atoi(serverMessageString[2])
+					id, err := strconv.Atoi(idString)
 					CheckError(err)
 					client.SetId(id)
 					client.SetNick(waitingRequestsArray[1])
@@ -64,14 +67,16 @@ func manageWebSocket(ws *websocket.Conn) {
 				if waitingRequests[int32(key)] != nil {
 					delete(waitingRequests, int32(key))
 				}
-				default:
+				case "F":
+				_, err := ws.Write([]byte(serverMessageString[2]))
+				CheckError(err)
 				
 			}
 		}
 		
 		
-		_, err := ws.Write(serverMessage)
-		CheckError(err)
+//		_, err := ws.Write(serverMessage)
+//		CheckError(err)
 	}
 }
 
