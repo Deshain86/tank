@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 
 	"golang.org/x/net/websocket"
 )
@@ -14,7 +15,7 @@ var conn *net.UDPConn
 var ServerAddr *net.UDPAddr
 
 //// CLIENT ////////
-func repeatMessage(msg []byte) []byte {
+func sendMessage(msg []byte) []byte {
 	log.Println(string(msg))
 	_, err := conn.Write(msg)
 	CheckError(err)
@@ -34,14 +35,24 @@ func main() {
 	ReadFromWebsocket := func(ws *websocket.Conn) {
 	forLoop:
 		for {
-			msg := make([]byte, 10)
+			msg := make([]byte, 100)
 			_, err := ws.Read(msg)
 			if err != nil {
+				log.Println(err)
 				break forLoop
 			}
-			msg = repeatMessage(msg)
 
-			ws.Write(msg)
+			switch {
+			case strings.Contains(string(msg), "nick:"):
+				nick := "login:" + string(msg)[5:]
+				msgFromServer := sendMessage([]byte(nick))
+				log.Println(string(msgFromServer))
+			default:
+				msgToServer := msg[0:10]
+				msgFromServer := sendMessage(msgToServer)
+				ws.Write(msgFromServer)
+			}
+
 		}
 	}
 	http.Handle("/echo", websocket.Handler(ReadFromWebsocket))
