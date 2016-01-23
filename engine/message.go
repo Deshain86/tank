@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"net"
 	"strconv"
 )
 
@@ -27,10 +28,11 @@ type User struct {
 	Direction int
 }
 
-func (self *Server) ParseResponse(msg string, clientId string) {
-	tmp := self.clients[clientId] // users[clientId]
+func (s *Server) ParseResponse(msg string, remoteaddr *net.UDPAddr) {
+	tmp := s.clients[remoteaddr.String()] // users[clientId]
 	if tmp == nil {
-		log.Print("brak uzytkownika ", clientId)
+		log.Print("no user found", remoteaddr.String())
+		s.sendResponse(remoteaddr, "no user found")
 		return
 	}
 	switch msg {
@@ -59,7 +61,8 @@ func (self *Server) ParseResponse(msg string, clientId string) {
 		tmp.Speed = 0
 	}
 
-	self.clients[clientId] = tmp
+	s.clients[remoteaddr.String()] = tmp
+	s.sendResponse(remoteaddr, "no user found")
 }
 
 func (self *Server) BuildAnswer(clientId int, firstAnswer bool) string {

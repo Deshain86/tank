@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"strconv"
 	"strings"
 	"time"
 
@@ -19,6 +18,7 @@ func sendResponse(conn *net.UDPConn, addr *net.UDPAddr, msg string) {
 }
 
 func main() {
+	log.SetFlags(log.Lshortfile)
 
 	addr := net.UDPAddr{
 		Port: 12888,
@@ -36,7 +36,7 @@ func main() {
 		for {
 			server.SendAll()
 			log.Print("sendAll")
-			<-time.After(1 * time.Second)
+			<-time.After(5 * time.Second)
 		}
 	}()
 	for {
@@ -48,15 +48,13 @@ func main() {
 			continue
 		}
 		tmp := strings.Split(string(msg[:n]), ":")
-		log.Println(string(msg))
+		//		log.Println(string(msg))
 		switch string(tmp[0]) {
 		case "login":
 			client := server.NewClient(remoteaddr)
 			server.Add(client)
-			sendResponse(ser, remoteaddr, strconv.Itoa(client.GetId()))
 		default:
-			server.ParseResponse(tmp[0], remoteaddr.String())
-			sendResponse(ser, remoteaddr, "OK")
+			server.ParseResponse(tmp[0], remoteaddr)
 		}
 	}
 }

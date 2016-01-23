@@ -3,6 +3,7 @@ package engine
 import (
 	"log"
 	"net"
+	"strconv"
 )
 
 var refreshModifier float32 = 1
@@ -59,6 +60,7 @@ func NewServer(conn *net.UDPConn) *Server {
 }
 
 func (s *Server) Add(c *Client) {
+	s.sendResponse(c.RemoteAddr, strconv.Itoa(c.GetId()))
 	s.addCh <- c
 }
 
@@ -78,11 +80,9 @@ func (s *Server) sendPastMessages(c *Client) {
 func (s *Server) SendAll() {
 	s.calcAll()
 	for _, c := range s.clients {
-
 		m := s.BuildAnswer(c.id, false)
 		s.sendResponse(c.RemoteAddr, m)
-		log.Print("QWE", m)
-		//		c.Write(&m)
+		log.Print("msg: ", m)
 	}
 	s.scoreRead()
 	s.explosionRead()
