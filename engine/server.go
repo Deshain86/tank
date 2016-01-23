@@ -12,12 +12,12 @@ var refreshModifier float32 = 1
 
 type Server struct {
 	conn      *net.UDPConn
+	userId    int32
 	reqId     int32
 	clients   map[string]*Client
 	bullets   []*Bullet
 	explosion Explosion
 	addCh     chan *Client
-	delCh     chan *Client
 	doneCh    chan bool
 	errCh     chan error
 	score     Scores
@@ -29,7 +29,6 @@ func NewServer(conn *net.UDPConn) *Server {
 	explosion := Explosion{}
 	clients := make(map[string]*Client)
 	addCh := make(chan *Client)
-	delCh := make(chan *Client)
 	doneCh := make(chan bool)
 	errCh := make(chan error)
 	var score Scores
@@ -37,14 +36,15 @@ func NewServer(conn *net.UDPConn) *Server {
 
 	m := &mapa{}
 	var reqId int32 = 0
+	var userId int32 = 1
 	s := &Server{
 		conn,
+		userId,
 		reqId,
 		clients,
 		bullets,
 		explosion,
 		addCh,
-		delCh,
 		doneCh,
 		errCh,
 		score,
@@ -58,10 +58,6 @@ func NewServer(conn *net.UDPConn) *Server {
 func (s *Server) Add(c *Client, reqId string) {
 	s.sendResponse("LOGIN", c.RemoteAddr, strconv.Itoa(c.GetId())+";"+reqId)
 	s.addCh <- c
-}
-
-func (s *Server) Del(c *Client) {
-	s.delCh <- c
 }
 
 func (s *Server) Err(err error) {
@@ -90,10 +86,6 @@ func (s *Server) Listen() {
 			s.clients[c.RemoteAddrStr] = c
 			log.Println("Now", len(s.clients), "clients connected.")
 			s.sendPastMessages(c)
-
-		case c := <-s.delCh:
-			log.Println("Delete client")
-			delete(s.clients, c.RemoteAddrStr)
 
 		case err := <-s.errCh:
 			log.Println("Error:", err.Error())
