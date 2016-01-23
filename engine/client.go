@@ -1,8 +1,8 @@
 package engine
 
 import (
+	"fmt"
 	"net"
-	"strconv"
 )
 
 const channelBufSize int = 100
@@ -39,14 +39,9 @@ type Client struct {
 }
 
 // Create new chat client.
-func (server *Server) NewClient(remoteAddr *net.UDPAddr, nick string, reqId string) (*Client, int) {
+func (server *Server) NewClient(remoteAddr *net.UDPAddr, nick string) *Client {
 	if remoteAddr == nil {
 		panic("remoteAddr cannot be nil")
-	}
-	tmp := server.clients[remoteAddr.String()] // users[clientId]
-	if tmp != nil {
-		server.sendResponse("LOGIN", remoteAddr, strconv.Itoa(tmp.GetId())+";"+reqId)
-		return nil, tmp.GetId()
 	}
 
 	maxId = len(server.clients) + 1
@@ -71,9 +66,31 @@ func (server *Server) NewClient(remoteAddr *net.UDPAddr, nick string, reqId stri
 		false,
 		0,
 		float32(position[0]),
-		float32(position[1])}, 0
+		float32(position[1])}
 }
 
 func (c *Client) GetId() int {
 	return c.id
+}
+
+func (c *Client) SetId(id int) {
+	c.id = id
+}
+
+func (c *Client) GetNick() string {
+	return c.nick
+}
+
+func (c *Client) SetNick(nick string) {
+	c.nick = nick
+}
+
+func (c *Client) Write(ans *string) {
+	select {
+	case c.ch <- ans:
+	default:
+		c.server.Del(c)
+		err := fmt.Errorf("client %d is disconnected.", c.id)
+		c.server.Err(err)
+	}
 }
