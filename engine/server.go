@@ -99,7 +99,7 @@ func (s *Server) Listen() {
 
 func (s *Server) sendResponse(typ string, addr *net.UDPAddr, msg string) {
 	id := atomic.AddInt32(&s.reqId, 1)
-	log.Print("msg: ", fmt.Sprintf("%d;%s;%s", id, typ, msg))
+	// log.Print("msg: ", fmt.Sprintf("%d;%s;%s", id, typ, msg))
 	_, err := s.conn.WriteToUDP([]byte(fmt.Sprintf("%d;%s;%s", id, typ, msg)), addr)
 	if err != nil {
 		log.Printf("Couldn't send response %v", err)

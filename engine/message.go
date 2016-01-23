@@ -15,6 +15,18 @@ func (s *Server) ParseResponse(idReq string, msg string, remoteaddr *net.UDPAddr
 		s.sendResponse("ERROR", remoteaddr, "no user found")
 		return
 	}
+
+	idReqInt, err := strconv.ParseInt(idReq, 10, 32)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if tmp.idReqMax < int32(idReqInt) {
+		tmp.idReqMax = int32(idReqInt)
+	} else {
+		log.Print("message is old")
+		return
+	}
 	switch msg {
 	case "fire":
 		tmp.Fire = true

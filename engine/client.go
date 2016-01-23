@@ -22,6 +22,7 @@ var firstPosition [][]float32 = [][]float32{
 type Client struct {
 	id            int
 	nick          string
+	idReqMax      int32
 	RemoteAddr    *net.UDPAddr
 	RemoteAddrStr string
 	server        *Server
@@ -53,6 +54,7 @@ func (server *Server) NewClient(remoteAddr *net.UDPAddr, nick string, reqId stri
 	return &Client{
 		maxId,
 		nick,
+		0,
 		remoteAddr,
 		remoteAddr.String(),
 		server,

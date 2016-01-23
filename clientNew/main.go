@@ -1,18 +1,18 @@
 package main
 
 import (
-	"strings"
 	"bufio"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync/atomic"
 	"time"
 
-	"golang.org/x/net/websocket"
 	"../engine"
+	"golang.org/x/net/websocket"
 )
 
 var conn *net.UDPConn
@@ -42,11 +42,11 @@ func manageWebSocket(ws *websocket.Conn) {
 	for {
 		serverMessage := <-serverMsg
 		serverMessageString := strings.SplitN(string(serverMessage), ";", 3)
-		log.Println(serverMessageString)
+		// log.Println(serverMessageString)
 		log.Println(waitingRequests)
 		if len(serverMessageString) == 3 {
 			switch serverMessageString[1] {
-				case  "LOGIN":
+			case "LOGIN":
 				idKey := strings.SplitN(string(serverMessageString[2]), ";", 2)
 				idString := idKey[0]
 				keyString := idKey[1]
@@ -54,29 +54,28 @@ func manageWebSocket(ws *websocket.Conn) {
 				log.Println(key)
 				CheckError(err)
 				if waitingRequests[int32(key)] != nil {
-					waitingRequestsArray := strings.Split(string(waitingRequests[int32(key)]),";")
+					waitingRequestsArray := strings.Split(string(waitingRequests[int32(key)]), ";")
 					id, err := strconv.Atoi(idString)
 					CheckError(err)
 					client.SetId(id)
 					client.SetNick(waitingRequestsArray[1])
 					delete(waitingRequests, int32(key))
 				}
-				case  "OK":
+			case "OK":
 				key, err := strconv.ParseInt(serverMessageString[2], 10, 32)
 				CheckError(err)
 				if waitingRequests[int32(key)] != nil {
 					delete(waitingRequests, int32(key))
 				}
-				case "F":
+			case "F":
 				_, err := ws.Write([]byte(serverMessageString[2]))
 				CheckError(err)
-				
+
 			}
 		}
-		
-		
-//		_, err := ws.Write(serverMessage)
-//		CheckError(err)
+
+		//		_, err := ws.Write(serverMessage)
+		//		CheckError(err)
 	}
 }
 
@@ -107,7 +106,7 @@ func main() {
 			go func(messageToSend []byte, msgId int32) {
 				waitingRequests[msgId] = messageToSend
 				for waitingRequests[msgId] != nil {
-					toSend := []byte(strconv.FormatInt(int64(msgId), 32) + ";")
+					toSend := []byte(fmt.Sprintf("%d;", msgId))
 					sendMessage(append(toSend, messageToSend...))
 					<-time.After(time.Second * 2)
 				}

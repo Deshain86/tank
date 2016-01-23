@@ -31,8 +31,8 @@ func main() {
 	go func() {
 		for {
 			server.SendAll()
-			log.Print("sendAll")
-			<-time.After(5 * time.Second)
+			// log.Print("sendAll")
+			<-time.After(time.Second / 20)
 		}
 	}()
 	for {
