@@ -67,12 +67,9 @@ func main() {
 			switch {
 			case strings.Contains(string(msg), "login:"):
 				go sendMessage(msg[:n])
-//				log.Println(string(msgFromServer))
 			default:
 				msgToServer := msg[:n]
 				go sendMessage(msgToServer)
-//				log.Println(len(msgFromServer))
-//				ws.Write(msgFromServer)
 			}
 		}
 		
@@ -94,6 +91,5 @@ func main() {
 	
 	go manageMessages()
 
-	//	open.Run("http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
