@@ -10,15 +10,8 @@ import (
 	"../engine"
 )
 
-func sendResponse(conn *net.UDPConn, addr *net.UDPAddr, msg string) {
-	_, err := conn.WriteToUDP([]byte(msg), addr)
-	if err != nil {
-		log.Printf("Couldn't send response %v", err)
-	}
-}
-
 func main() {
-	log.SetFlags(log.Lshortfile)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
 	ServerAddr, err := net.ResolveUDPAddr("udp", ":8081")
 	if err != nil {
@@ -34,7 +27,7 @@ func main() {
 
 	server := engine.NewServer(ser)
 	go server.Listen()
-	log.Println("listening on 12888...")
+	log.Println("listening on 8081...")
 	go func() {
 		for {
 			server.SendAll()
@@ -51,13 +44,17 @@ func main() {
 			fmt.Printf("Some error  %v", err)
 			continue
 		}
-		tmp := strings.Split(string(msg[:n]), ":")
-		switch string(tmp[0]) {
-		case "login":
-			client := server.NewClient(remoteaddr)
-			server.Add(client)
-		default:
-			server.ParseResponse(tmp[0], remoteaddr)
+		tmp := strings.Split(string(msg[:n]), ";")
+		if len(tmp) > 1 {
+			switch string(tmp[1]) {
+			case "login":
+				if len(tmp) == 3 {
+					client := server.NewClient(remoteaddr, tmp[2])
+					server.Add(client)
+				}
+			default:
+				server.ParseResponse(tmp[0], tmp[1], remoteaddr)
+			}
 		}
 	}
 }

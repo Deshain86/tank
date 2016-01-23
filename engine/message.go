@@ -28,11 +28,11 @@ type User struct {
 	Direction int
 }
 
-func (s *Server) ParseResponse(msg string, remoteaddr *net.UDPAddr) {
+func (s *Server) ParseResponse(idReq string, msg string, remoteaddr *net.UDPAddr) {
 	tmp := s.clients[remoteaddr.String()] // users[clientId]
 	if tmp == nil {
 		log.Print("no user found", remoteaddr.String())
-		s.sendResponse(remoteaddr, "no user found")
+		s.sendResponse("ERROR", remoteaddr, "no user found")
 		return
 	}
 	switch msg {
@@ -62,7 +62,7 @@ func (s *Server) ParseResponse(msg string, remoteaddr *net.UDPAddr) {
 	}
 
 	s.clients[remoteaddr.String()] = tmp
-	s.sendResponse(remoteaddr, "no user found")
+	s.sendResponse("OK", remoteaddr, idReq)
 }
 
 func (self *Server) BuildAnswer(clientId int, firstAnswer bool) string {

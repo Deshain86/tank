@@ -1,9 +1,11 @@
 package engine
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"strconv"
+	"sync/atomic"
 )
 
 var refreshModifier float32 = 1
@@ -11,6 +13,7 @@ var refreshModifier float32 = 1
 // Chat server.
 type Server struct {
 	conn      *net.UDPConn
+	reqId     int32
 	messages  []*Message
 	clients   map[string]*Client
 	bullets   []*Bullet
@@ -39,9 +42,10 @@ func NewServer(conn *net.UDPConn) *Server {
 	score.client = make(map[int]int)
 	//	refreshModifier = mod
 	m := &mapa{}
-
+	var reqId int32 = 0
 	s := &Server{
 		conn,
+		reqId,
 		messages,
 		clients,
 		bullets,
@@ -60,7 +64,7 @@ func NewServer(conn *net.UDPConn) *Server {
 }
 
 func (s *Server) Add(c *Client) {
-	s.sendResponse(c.RemoteAddr, strconv.Itoa(c.GetId()))
+	s.sendResponse("LOGIN", c.RemoteAddr, strconv.Itoa(c.GetId()))
 	s.addCh <- c
 }
 
@@ -81,7 +85,7 @@ func (s *Server) SendAll() {
 	s.calcAll()
 	for _, c := range s.clients {
 		m := s.BuildAnswer(c.id, false)
-		s.sendResponse(c.RemoteAddr, m)
+		s.sendResponse("MAP", c.RemoteAddr, m)
 		log.Print("msg: ", m)
 	}
 	s.scoreRead()
@@ -116,8 +120,9 @@ func (s *Server) Listen() {
 	}
 }
 
-func (s *Server) sendResponse(addr *net.UDPAddr, msg string) {
-	_, err := s.conn.WriteToUDP([]byte(msg), addr)
+func (s *Server) sendResponse(typ string, addr *net.UDPAddr, msg string) {
+	id := atomic.AddInt32(&s.reqId, 1)
+	_, err := s.conn.WriteToUDP([]byte(fmt.Sprintf("%d;%s;%s", id, typ, msg)), addr)
 	if err != nil {
 		log.Printf("Couldn't send response %v", err)
 	}
