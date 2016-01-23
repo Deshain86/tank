@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Client Test</title>
+  <title>AngryGophers TANK</title>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"
           type="text/javascript"></script>
@@ -21,6 +21,12 @@
         </button>
     </div>
     <script type="text/javascript">
+      var keySpacePressed = false;
+      var keyUpPressed = false;
+      var keyDownPressed = false;
+      var keyLeftPressed = false;
+      var keyRightPressed = false;
+
       var websocket = new WebSocket("ws://localhost:8080/echo");
       websocket.onmessage = function(str)
       {
@@ -32,49 +38,80 @@
         websocket.send(action);
       }
 
-      function doKeyDown(evt)
-      {
-        switch (evt.keyCode)
-        {
+
+      function doKeyDown(evt) {
+        switch (evt.keyCode) {
           case 32:
-            websocketAction('fire');
+            if (!keySpacePressed) {
+              // pressed.push("fire");
+              keySpacePressed = true;
+              // websocketAction("fire");
+              websocketAction('fire');
+            }
             break;
           case 38:
-            websocketAction("up");
+            if (!keyUpPressed) {
+              keyUpPressed = true;
+              websocketAction("up");
+            }
           break;
           case 40:  /* Down arrow */
-            websocketAction("down");
+            if (!keyDownPressed) {
+              keyDownPressed = true;
+              websocketAction("down");
+            }
           break;
           case 37:  /* Left arrow was pressed */
-            websocketAction("left");
+            if (!keyLeftPressed) {
+              keyLeftPressed = true;
+              websocketAction("left");
+            }
           break;
           case 39:  /* Right arrow was pressed */
-            websocketAction("right");
+            if (!keyRightPressed) {
+              keyRightPressed = true;
+              websocketAction("right");
+            }
           break;
         }
       }
 
-      function doKeyUp(evt){
+      function doKeyUp(evt) {
         var direction;
-        switch (evt.keyCode)
-         {
+        switch (evt.keyCode) {
           case 32:
-            websocketAction('fire2');
+            if (keySpacePressed) {
+              // direction = "fire2";
+              websocketAction('fire2');
+              // removePressed('fire');
+              keySpacePressed = false;
+            }
           break;
           case 38:
-            direction = "up2";
+            if (keyUpPressed) {
+              websocketAction('up2');
+              keyUpPressed = false;
+            }
           break;
           case 40:  /* Down arrow was pressed */
-            direction = "down2";
+            if (keyDownPressed) {
+              websocketAction('down2');
+              keyDownPressed = false;
+            }
           break;
           case 37:  /* Left arrow was pressed */
-            direction = "left2";
+            if (keyLeftPressed) {
+              websocketAction('left2');
+              keyLeftPressed = false;
+            }
           break;
           case 39:  /* Right arrow was pressed */
-            direction = "right2";
+            if (keyRightPressed) {
+              websocketAction('right2');
+              keyRightPressed = false;
+            }
           break;
         }
-        websocketAction(direction);
       }
 
       window.addEventListener('keydown',doKeyDown, true);
