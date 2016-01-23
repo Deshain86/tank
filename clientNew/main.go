@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"net"
@@ -12,15 +13,32 @@ import (
 
 var conn *net.UDPConn
 var ServerAddr *net.UDPAddr
+var serverMsg chan []byte
 
 //// CLIENT ////////
-func sendMessage(msg []byte) []byte {
+func sendMessage(msg []byte) {
 	log.Println(string(msg))
 	_, err := conn.Write(msg)
 	CheckError(err)
-	msgFromServer := make([]byte, 2048)
-	//	bufio.NewReader(conn).Read(msgFromServer)
-	return msgFromServer
+
+	//	return msgFromServer[:n]
+}
+
+func manageMessages() {
+	for {
+		msgFromServer := make([]byte, 2048)
+		n, err := bufio.NewReader(conn).Read(msgFromServer)
+		CheckError(err)
+		serverMsg <- msgFromServer[:n]
+	}
+}
+
+func manageWebSocket(ws *websocket.Conn) {
+	for {
+		serverMessage := <-serverMsg
+		_, err := ws.Write(serverMessage)
+		CheckError(err)
+	}
 }
 
 func CheckError(err error) {
@@ -30,8 +48,10 @@ func CheckError(err error) {
 }
 
 func main() {
+	serverMsg = make(chan []byte)
 	log.SetFlags(log.Lshortfile)
 	ReadFromWebsocket := func(ws *websocket.Conn) {
+		go manageWebSocket(ws)
 	forLoop:
 		for {
 			msg := make([]byte, 100)
@@ -43,17 +63,17 @@ func main() {
 			}
 
 			switch {
-			case strings.Contains(string(msg), "nick:"):
-				nick := "login:" + string(msg)[5:n]
-				msgFromServer := sendMessage([]byte(nick))
-				log.Println(string(msgFromServer))
+			case strings.Contains(string(msg), "login:"):
+				go sendMessage(msg[:n])
+				//				log.Println(string(msgFromServer))
 			default:
 				msgToServer := msg[:n]
-				msgFromServer := sendMessage(msgToServer)
-				ws.Write(msgFromServer)
+				go sendMessage(msgToServer)
+				//				log.Println(len(msgFromServer))
+				//				ws.Write(msgFromServer)
 			}
-
 		}
+
 	}
 	http.Handle("/echo", websocket.Handler(ReadFromWebsocket))
 
@@ -69,6 +89,8 @@ func main() {
 	conn, err = net.DialUDP("udp", ClientAddr, ServerAddr)
 	CheckError(err)
 	defer conn.Close()
+
+	go manageMessages()
 
 	//	open.Run("http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
