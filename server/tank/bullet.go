@@ -8,33 +8,33 @@ const bulletHeightHalf float32 = 6.5
 type Bullet struct {
 	x         float32
 	y         float32
+	speed     float32
 	direction int
 	ownerId   int
 }
 
 func (s *Server) checkBulletsOnMap(mapSizeX, mapSizeY float32, refreshTime float32) {
-	var bSpeed = bulletSpeed * refreshTime
 	var newList []*Bullet
 forLoop:
 	for _, b := range s.bullets {
 		switch b.direction {
 		case 0:
-			b.y -= bSpeed
+			b.y -= b.speed * refreshTime
 			if b.y < 0 {
 				continue forLoop
 			}
 		case 90:
-			b.x += bSpeed
+			b.x += b.speed * refreshTime
 			if b.x > mapSizeX {
 				continue forLoop
 			}
 		case 180:
-			b.y += bSpeed
+			b.y += b.speed * refreshTime
 			if b.y > mapSizeY {
 				continue forLoop
 			}
 		case 270:
-			b.x -= bSpeed
+			b.x -= b.speed * refreshTime
 			if b.x < 0 {
 				continue forLoop
 			}

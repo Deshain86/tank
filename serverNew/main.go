@@ -54,8 +54,6 @@ func main() {
 						server.Add(client, tmp[0])
 					}
 				}
-			case "fake":
-
 			default:
 				server.ParseResponse(tmp[0], tmp[1], remoteaddr)
 			}

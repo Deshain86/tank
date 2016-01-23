@@ -1,9 +1,9 @@
 package engine
 
 import (
-	"fmt"
 	"net"
 	"strconv"
+	"sync/atomic"
 )
 
 const channelBufSize int = 100
@@ -25,8 +25,6 @@ type Client struct {
 	RemoteAddr    *net.UDPAddr
 	RemoteAddrStr string
 	server        *Server
-	ch            chan *string
-	doneCh        chan bool
 	PositionX     float32
 	PositionY     float32
 	Life          int
@@ -39,7 +37,6 @@ type Client struct {
 	StartPosY     float32
 }
 
-// Create new chat client.
 func (server *Server) NewClient(remoteAddr *net.UDPAddr, nick string, reqId string) (*Client, int) {
 	if remoteAddr == nil {
 		panic("remoteAddr cannot be nil")
@@ -50,9 +47,7 @@ func (server *Server) NewClient(remoteAddr *net.UDPAddr, nick string, reqId stri
 		return nil, tmp.GetId()
 	}
 
-	maxId = len(server.clients) + 1
-	ch := make(chan *string, channelBufSize)
-	doneCh := make(chan bool)
+	maxId = int(atomic.AddInt32(&server.userId, 1))
 	position := firstPosition[maxId%4]
 
 	return &Client{
@@ -61,8 +56,6 @@ func (server *Server) NewClient(remoteAddr *net.UDPAddr, nick string, reqId stri
 		remoteAddr,
 		remoteAddr.String(),
 		server,
-		ch,
-		doneCh,
 		float32(position[0]),
 		float32(position[1]),
 		fullLife,
@@ -89,14 +82,4 @@ func (c *Client) GetNick() string {
 
 func (c *Client) SetNick(nick string) {
 	c.nick = nick
-}
-
-func (c *Client) Write(ans *string) {
-	select {
-	case c.ch <- ans:
-	default:
-		c.server.Del(c)
-		err := fmt.Errorf("client %d is disconnected.", c.id)
-		c.server.Err(err)
-	}
 }

@@ -10,12 +10,6 @@ type mapa struct {
 }
 
 func (s *Server) getSpeedPosition(x, y float32) float32 {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Println("Recovered in f", r)
-			log.Print(x, y)
-		}
-	}()
 	// log.Print(x, y)
 	return float32(s.mapa.speedPoint[int(x)][int(y)]) / 10
 }
