@@ -10,6 +10,16 @@ import (
 	"../engine"
 )
 
+const framePerSec int64 = 10
+const timePerFrame int64 = 1000000 / framePerSec
+
+func sendResponse(conn *net.UDPConn, addr *net.UDPAddr, msg string) {
+	_, err := conn.WriteToUDP([]byte(msg), addr)
+	if err != nil {
+		log.Printf("Couldn't send response %v", err)
+	}
+}
+
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
@@ -25,16 +35,32 @@ func main() {
 		return
 	}
 
+	log.Println(timePerFrame, " - timePerFrame")
+
 	server := engine.NewServer(ser)
 	go server.Listen()
 	log.Println("listening on 8081...")
 	go func() {
 		for {
+			actualTime := time.Now().UnixNano()
+
 			server.SendAll()
-			// log.Print("sendAll")
-			<-time.After(time.Second / 20)
+			log.Print("sendAll")
+			log.Print("timeNow", time.Now())
+
+			differenceTime := (time.Now().UnixNano() - actualTime) / 1000 //microseconds
+			//log.Print(differenceTime)
+			if differenceTime < timePerFrame {
+				//	log.Println("Sleeep", int64((timePerFrame-differenceTime)/1000))
+				//	log.Println(time.Duration(timePerFrame-differenceTime) * time.Microsecond)
+				time.Sleep(time.Duration(timePerFrame-differenceTime) * time.Microsecond)
+			}
+
+			//			log.Panic("swer")
 		}
+
 	}()
+
 	for {
 		msg := make([]byte, 100)
 		n, remoteaddr, err := ser.ReadFromUDP(msg)
@@ -58,5 +84,10 @@ func main() {
 				server.ParseResponse(tmp[0], tmp[1], remoteaddr)
 			}
 		}
+
+		for {
+
+		}
 	}
+
 }
