@@ -6,15 +6,15 @@ import (
 	"net"
 )
 
-func sendResponse(conn *net.UDPConn, addr *net.UDPAddr, msg []byte) {
-	_, err := conn.WriteToUDP(msg, addr)
+func sendResponse(conn *net.UDPConn, addr *net.UDPAddr, msg string) {
+	_, err := conn.WriteToUDP([]byte(msg), addr)
 	if err != nil {
 		log.Printf("Couldn't send response %v", err)
 	}
 }
 
 func main() {
-	msg := make([]byte, 2048)
+	msg := make([]byte, 10)
 	addr := net.UDPAddr{
 		Port: 12888,
 		IP:   net.ParseIP("127.0.0.1"),
@@ -25,6 +25,7 @@ func main() {
 		return
 	}
 	log.Println("listening on 12888...")
+
 	for {
 		_, remoteaddr, err := ser.ReadFromUDP(msg)
 		fmt.Printf("Read a message from %v %s \n", remoteaddr, msg)
@@ -32,6 +33,6 @@ func main() {
 			fmt.Printf("Some error  %v", err)
 			continue
 		}
-		go sendResponse(ser, remoteaddr, msg)
+		go sendResponse(ser, remoteaddr, "YO")
 	}
 }
