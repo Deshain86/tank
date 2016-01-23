@@ -3,17 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <title>Client Test</title>
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"
+          type="text/javascript"></script>
 </head>
 <body>
   <section>
-    <h1> Testing this biatch!</h1>
+    <h1> Testing this bladź!</h1>
     <div id="test">
+    </div>
+
+    <div id="newSession">
+        Podaj nick czopku: <input id="nickName" name="nick">
+        <button id="submitNick">
+          Send
+        </button>
     </div>
     <script type="text/javascript">
       var websocket = new WebSocket("ws://localhost:8080/echo");
       websocket.onmessage = function(str)
       {
-        document.getElementById('test').innerHTML += str.data + "<br />";
+        //document.getElementById('test').innerHTML += str.data + "<br />";
       };
 
       function websocketAction(action)
@@ -68,6 +78,14 @@
 
       window.addEventListener('keydown',doKeyDown, true);
       window.addEventListener('keyup', doKeyUp, true);
+
+      $(function() {
+        $("#submitNick").click(function() {
+          websocketAction("login:" + $('#nickName').val());
+          $('#newSession').hide();
+        });
+      });
+
       </script>
     </section>
 </body>
