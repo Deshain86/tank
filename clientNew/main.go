@@ -36,7 +36,8 @@ func main() {
 	forLoop:
 		for {
 			msg := make([]byte, 100)
-			_, err := ws.Read(msg)
+			n, err := ws.Read(msg)
+
 			if err != nil {
 				log.Println(err)
 				break forLoop
@@ -44,11 +45,11 @@ func main() {
 
 			switch {
 			case strings.Contains(string(msg), "nick:"):
-				nick := "login:" + string(msg)[5:]
+				nick := "login:" + string(msg)[5:n]
 				msgFromServer := sendMessage([]byte(nick))
 				log.Println(string(msgFromServer))
 			default:
-				msgToServer := msg[0:10]
+				msgToServer := msg[:n]
 				msgFromServer := sendMessage(msgToServer)
 				ws.Write(msgFromServer)
 			}

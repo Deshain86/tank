@@ -1,4 +1,4 @@
-package tank
+package engine
 
 const canvasSizeX float32 = 800
 const canvasSizeY float32 = 800

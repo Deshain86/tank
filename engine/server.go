@@ -1,10 +1,12 @@
 package engine
 
+import "log"
+
 var refreshModifier float32 = 1
 
 // Chat server.
 type Server struct {
-	pattern   string
+	//	pattern   string
 	messages  []*Message
 	clients   map[int]*Client
 	bullets   []*Bullet
@@ -19,7 +21,7 @@ type Server struct {
 }
 
 // Create new chat server.
-func NewServer(pattern string, mod float32) *Server {
+func NewServer() *Server {
 	var bullets []*Bullet
 	messages := []*Message{}
 	explosion := Explosion{}
@@ -31,11 +33,11 @@ func NewServer(pattern string, mod float32) *Server {
 	errCh := make(chan error)
 	var score Scores
 	score.client = make(map[int]int)
-	refreshModifier = mod
+	//	refreshModifier = mod
 	m := &mapa{}
 
 	s := &Server{
-		pattern,
+		//		pattern,
 		messages,
 		clients,
 		bullets,
@@ -61,10 +63,6 @@ func (s *Server) Del(c *Client) {
 	s.delCh <- c
 }
 
-// func (s *Server) Done() {
-// 	s.doneCh <- true
-// }
-
 func (s *Server) Err(err error) {
 	s.errCh <- err
 }
@@ -74,7 +72,7 @@ func (s *Server) sendPastMessages(c *Client) {
 	c.Write(&x)
 }
 
-func (s *Server) sendAll() {
+func (s *Server) SendAll() {
 	s.calcAll()
 	for _, c := range s.clients {
 		m := s.BuildAnswer(c.id, false)
@@ -82,4 +80,32 @@ func (s *Server) sendAll() {
 	}
 	s.scoreRead()
 	s.explosionRead()
+}
+
+// Listen and serve.
+// It serves client connection and broadcast request.
+func (s *Server) Listen() {
+	for {
+		select {
+
+		// Add new a client
+		case c := <-s.addCh:
+			log.Println("Added new client")
+			s.clients[c.id] = c
+			log.Println("Now", len(s.clients), "clients connected.")
+			s.sendPastMessages(c)
+
+		// del a client
+		case c := <-s.delCh:
+			log.Println("Delete client")
+			delete(s.clients, c.id)
+
+		case err := <-s.errCh:
+			log.Println("Error:", err.Error())
+
+		case <-s.doneCh:
+			log.Println("asdas")
+			return
+		}
+	}
 }

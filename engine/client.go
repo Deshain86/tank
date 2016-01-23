@@ -2,10 +2,7 @@ package engine
 
 import (
 	"fmt"
-	"io"
-	"log"
-
-	"golang.org/x/net/websocket"
+	"net"
 )
 
 const channelBufSize int = 100
@@ -23,7 +20,7 @@ var firstPosition [][]float32 = [][]float32{
 
 type Client struct {
 	id        int
-	ws        *websocket.Conn
+	ws        *net.UDPAddr
 	server    *Server
 	ch        chan *string
 	doneCh    chan bool
@@ -40,23 +37,19 @@ type Client struct {
 }
 
 // Create new chat client.
-func NewClient(ws *websocket.Conn, server *Server, id int) *Client {
-	if ws == nil {
+func (server *Server) NewClient(remoteAddr *net.UDPAddr) *Client {
+	if remoteAddr == nil {
 		panic("ws cannot be nil")
 	}
 
-	if server == nil {
-		panic("server cannot be nil")
-	}
-
-	maxId++
+	maxId = len(server.clients)
 	ch := make(chan *string, channelBufSize)
 	doneCh := make(chan bool)
-	position := firstPosition[id%4]
+	position := []float32{50, 50} //firstPosition[id%4]
 
 	return &Client{
 		maxId,
-		ws,
+		remoteAddr,
 		server,
 		ch,
 		doneCh,
@@ -72,8 +65,11 @@ func NewClient(ws *websocket.Conn, server *Server, id int) *Client {
 		float32(position[1])}
 }
 
-func (c *Client) Conn() *websocket.Conn {
-	return c.ws
+//func (c *Client) Conn() *websocket.Conn {
+//	return c.ws
+//}
+func (c *Client) GetId() int {
+	return c.id
 }
 
 func (c *Client) Write(ans *string) {
@@ -87,58 +83,58 @@ func (c *Client) Write(ans *string) {
 }
 
 // func (c *Client) Done() {
-// 	c.doneCh <- true
-// }
+//// 	c.doneCh <- true
+//// }
 
-// Listen Write and Read request via chanel
-func (c *Client) Listen() {
-	go c.listenWrite()
-	c.listenRead()
-}
+////// Listen Write and Read request via chanel
+////func (c *Client) Listen() {
+////	go c.listenWrite()
+////	c.listenRead()
+////}
 
-// Listen write request via chanel
-func (c *Client) listenWrite() {
-	log.Println("Listening write to client")
-	for {
-		select {
+//// Listen write request via chanel
+////func (c *Client) listenWrite() {
+////	log.Println("Listening write to client")
+////	for {
+////		select {
 
-		// send message to the client
-		case msg := <-c.ch:
-			websocket.Message.Send(c.ws, *msg)
+////		// send message to the client
+////		case msg := <-c.ch:
+////			websocket.Message.Send(c.ws, *msg)
 
-		// receive done request
-		case <-c.doneCh:
-			c.server.Del(c)
-			c.doneCh <- true // for listenRead method
-			return
-		}
-	}
-}
+////		// receive done request
+////		case <-c.doneCh:
+////			c.server.Del(c)
+////			c.doneCh <- true // for listenRead method
+////			return
+////		}
+////	}
+////}
 
-// Listen read request via chanel
-func (c *Client) listenRead() {
-	log.Println("Listening read from client")
-	for {
-		select {
+//// Listen read request via chanel
+//func (c *Client) listenRead() {
+//	log.Println("Listening read from client")
+//	for {
+//		select {
 
-		// receive done request
-		case <-c.doneCh:
-			c.server.Del(c)
-			c.doneCh <- true // for listenWrite method
-			return
+//		// receive done request
+//		case <-c.doneCh:
+//			c.server.Del(c)
+//			c.doneCh <- true // for listenWrite method
+//			return
 
-		// read data from websocket connection
-		default:
-			var msg string
-			err := websocket.Message.Receive(c.ws, &msg)
-			if err == io.EOF {
-				c.doneCh <- true
-			} else if err != nil {
-				c.server.Err(err)
-			} else {
-				log.Print("MSG ", msg)
-				c.server.ParseResponse(&msg, c.id)
-			}
-		}
-	}
-}
+//		// read data from websocket connection
+//		default:
+//			var msg string
+//			err := websocket.Message.Receive(c.ws, &msg)
+//			if err == io.EOF {
+//				c.doneCh <- true
+//			} else if err != nil {
+//				c.server.Err(err)
+//			} else {
+//				log.Print("MSG ", msg)
+//				c.server.ParseResponse(&msg, c.id)
+//			}
+//		}
+//	}
+//}

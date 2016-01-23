@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
+	"strings"
+
+	"../engine"
 )
 
 func sendResponse(conn *net.UDPConn, addr *net.UDPAddr, msg string) {
@@ -14,7 +18,8 @@ func sendResponse(conn *net.UDPConn, addr *net.UDPAddr, msg string) {
 }
 
 func main() {
-	msg := make([]byte, 10)
+	server := engine.NewServer()
+	go server.Listen()
 	addr := net.UDPAddr{
 		Port: 12888,
 		IP:   net.ParseIP("127.0.0.1"),
@@ -27,12 +32,24 @@ func main() {
 	log.Println("listening on 12888...")
 
 	for {
-		_, remoteaddr, err := ser.ReadFromUDP(msg)
+		msg := make([]byte, 100)
+		n, remoteaddr, err := ser.ReadFromUDP(msg)
 		fmt.Printf("Read a message from %v %s \n", remoteaddr, msg)
 		if err != nil {
 			fmt.Printf("Some error  %v", err)
 			continue
 		}
-		go sendResponse(ser, remoteaddr, "YO")
+		tmp := strings.Split(string(msg[:n]), ":")
+		switch string(tmp[0]) {
+		case "login":
+
+			client := server.NewClient(remoteaddr)
+			server.Add(client)
+			sendResponse(ser, remoteaddr, strconv.Itoa(client.GetId()))
+			//		case "up":
+			//			sendResponse(ser, remoteaddr, server.SendAll())
+		default:
+			sendResponse(ser, remoteaddr, "YO")
+		}
 	}
 }
