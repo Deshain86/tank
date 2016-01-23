@@ -25,6 +25,7 @@ forLoop:
 				c.LastFire = 20 * int(refreshModifier)
 				s.bullets = append(s.bullets,
 					&Bullet{
+						speed:     c.Speed + bulletSpeed,
 						ownerId:   c.id,
 						x:         c.PositionX + tankWidthHalf - bulletWidthHalf,
 						y:         c.PositionY + tankHeightHalf - bulletHeightHalf,
