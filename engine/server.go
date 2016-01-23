@@ -1,11 +1,15 @@
 package engine
 
-import "log"
+import (
+	"log"
+	"net"
+)
 
 var refreshModifier float32 = 1
 
 // Chat server.
 type Server struct {
+	conn      *net.UDPConn
 	messages  []*Message
 	clients   map[string]*Client
 	bullets   []*Bullet
@@ -20,7 +24,7 @@ type Server struct {
 }
 
 // Create new chat server.
-func NewServer() *Server {
+func NewServer(conn *net.UDPConn) *Server {
 	var bullets []*Bullet
 	messages := []*Message{}
 	explosion := Explosion{}
@@ -36,6 +40,7 @@ func NewServer() *Server {
 	m := &mapa{}
 
 	s := &Server{
+		conn,
 		messages,
 		clients,
 		bullets,
@@ -73,8 +78,11 @@ func (s *Server) sendPastMessages(c *Client) {
 func (s *Server) SendAll() {
 	s.calcAll()
 	for _, c := range s.clients {
+
 		m := s.BuildAnswer(c.id, false)
-		c.Write(&m)
+		s.sendResponse(c.RemoteAddr, m)
+		log.Print("QWE", m)
+		//		c.Write(&m)
 	}
 	s.scoreRead()
 	s.explosionRead()
@@ -105,5 +113,12 @@ func (s *Server) Listen() {
 			log.Println("asdas")
 			return
 		}
+	}
+}
+
+func (s *Server) sendResponse(addr *net.UDPAddr, msg string) {
+	_, err := s.conn.WriteToUDP([]byte(msg), addr)
+	if err != nil {
+		log.Printf("Couldn't send response %v", err)
 	}
 }
