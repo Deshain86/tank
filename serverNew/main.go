@@ -49,9 +49,13 @@ func main() {
 			switch string(tmp[1]) {
 			case "login":
 				if len(tmp) == 3 {
-					client := server.NewClient(remoteaddr, tmp[2])
-					server.Add(client)
+					client, clientId := server.NewClient(remoteaddr, tmp[2], tmp[0])
+					if clientId == 0 {
+						server.Add(client, tmp[0])
+					}
 				}
+			case "fake":
+
 			default:
 				server.ParseResponse(tmp[0], tmp[1], remoteaddr)
 			}

@@ -8,30 +8,10 @@ import (
 	"strconv"
 )
 
-type Message struct {
-	// Author    string
-	Body string
-	// PositionX int
-	// PositionY int
-}
-
-type Answer struct {
-	Users   []User
-	Bullets []*Bullet
-}
-
-type User struct {
-	Id        int
-	Color     string
-	PositionX float32
-	PositionY float32
-	Direction int
-}
-
 func (s *Server) ParseResponse(idReq string, msg string, remoteaddr *net.UDPAddr) {
 	tmp := s.clients[remoteaddr.String()] // users[clientId]
 	if tmp == nil {
-		log.Print("no user found", remoteaddr.String())
+		log.Print("no user found - ", remoteaddr.String())
 		s.sendResponse("ERROR", remoteaddr, "no user found")
 		return
 	}

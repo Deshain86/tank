@@ -16,8 +16,7 @@ forLoop:
 			c.PositionX = c.StartPosX
 			c.PositionY = c.StartPosY
 			s.scoreAdd(hitClientId)
-			m := s.BuildAnswer(c.id, false)
-			c.Write(&m)
+			s.sendResponse("MAP", c.RemoteAddr, s.BuildAnswer(c.id, false))
 			continue forLoop
 		}
 
