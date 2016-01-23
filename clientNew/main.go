@@ -20,8 +20,10 @@ func sendMessage(msg []byte) []byte {
 	_, err := conn.Write(msg)
 	CheckError(err)
 	msgFromServer := make([]byte, 2048)
-	bufio.NewReader(conn).Read(msgFromServer)
-	return msgFromServer
+	n,err :=bufio.NewReader(conn).Read(msgFromServer)
+	CheckError(err)
+	
+	return msgFromServer[:n]
 }
 
 func CheckError(err error) {
@@ -44,16 +46,15 @@ func main() {
 			}
 
 			switch {
-			case strings.Contains(string(msg), "nick:"):
-				nick := "login:" + string(msg)[5:n]
-				msgFromServer := sendMessage([]byte(nick))
+			case strings.Contains(string(msg), "login:"):
+				msgFromServer := sendMessage(msg[:n])
 				log.Println(string(msgFromServer))
 			default:
 				msgToServer := msg[:n]
 				msgFromServer := sendMessage(msgToServer)
+				log.Println(len(msgFromServer))
 				ws.Write(msgFromServer)
 			}
-
 		}
 	}
 	http.Handle("/echo", websocket.Handler(ReadFromWebsocket))
