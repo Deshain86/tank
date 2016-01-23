@@ -20,11 +20,8 @@ func sendResponse(conn *net.UDPConn, addr *net.UDPAddr, msg string) {
 func main() {
 	log.SetFlags(log.Lshortfile)
 
-	addr := net.UDPAddr{
-		Port: 12888,
-		IP:   net.ParseIP("127.0.0.1"),
-	}
-	ser, err := net.ListenUDP("udp", &addr)
+	addr,err := net.ResolveUDPAddr("udp", ":8081")
+	ser, err := net.ListenUDP("udp", addr)
 	if err != nil {
 		fmt.Printf("Some error %v\n", err)
 		return
