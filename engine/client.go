@@ -73,6 +73,18 @@ func (c *Client) GetId() int {
 	return c.id
 }
 
+func (c *Client) SetId(id int) {
+	c.id = id
+}
+
+func (c *Client) GetNick() string {
+	return c.nick
+}
+
+func (c *Client) SetNick(nick string) {
+	c.nick = nick
+}
+
 func (c *Client) Write(ans *string) {
 	select {
 	case c.ch <- ans:
