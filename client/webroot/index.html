@@ -82,7 +82,15 @@
     var smokeList = [];
     
     var lastPressed = "u";
-        var websocket = new WebSocket("ws://tanks-deshain.c9users.io/entry");
+    var websocket = new WebSocket("ws://localhost:8080/entry");
+
+    var soundExplosion = new Audio("./resources/Sounds/explosion.mp3");
+
+    var treeImage = new Image();
+    var treeList = [];
+
+    var rockImage = new Image();
+    var rockList = [];
 
      websocket.onmessage = function(str) {
         // console.log(str.data);
@@ -133,7 +141,7 @@
               {
                 str = score.innerHTML;
               }
-              scores = true
+              scores = true;
               str += data[1] + " - " + data[2] + "<br />";
               score.innerHTML = str;
               break;
@@ -144,6 +152,27 @@
                 height: 128,
                 image: smokeImage,
                 numberOfFrames: 10,
+                ticksPerFrame: 2,
+                x: parseFloat(data[1]),
+                y: parseFloat(data[2])
+              });
+              smokeList.push(smoke);
+              soundExplosion.cloneNode().play();
+              break;
+            case 'TREE':
+              break;
+            case 'ROCK':
+              break;
+            case 'POWERUP':
+              break;
+            case 'SMOKE':
+              var smoke = Sprite({
+                context: ctx,
+                width: 1280,
+                height: 128,
+                image: smokeImage,
+                numberOfFrames: 10,
+                ticksPerFrame: 20,
                 x: parseFloat(data[1]),
                 y: parseFloat(data[2])
               });
@@ -181,7 +210,7 @@
 
           obj.frameIndex = 0;
           obj.tickCount = 0;
-          obj.ticksPerFrame = 2;
+          obj.ticksPerFrame = options.ticksPerFrame;
           obj.numberOfFrames = options.numberOfFrames || 1;
 
           obj.destroy = false;
@@ -214,6 +243,34 @@
                 obj.destroy = true;
               }
             }
+          };
+
+          return obj;
+        }
+
+        function EnvObj(options) {
+          var obj = {};
+
+          obj.context = options.context;
+          obj.image = options.image;
+          obj.width = options.width;
+          obj.height = options.height;
+          obj.x = options.x;
+          obj.y = options.y;
+
+          obj.destroy = false;
+
+          obj.render = function () {
+            obj.context.drawImage(
+              obj.image,
+              0,
+              0,
+              obj.width,
+              obj.height,
+              obj.x - (obj.height / 2),
+              obj.y - (obj.height / 2),
+              obj.width,
+              obj.height);
           };
 
           return obj;
@@ -303,14 +360,22 @@
 	
   	  for (var i = 0; i < envGroundList.length; i++) {
     		var env = new Image();
-    		env.src = envPath + envGroundList[i]
+    		env.src = envPath + envGroundList[i];
     		envImages.push(env);
     	}
 
       smokeImage.src = "./resources/Smoke/smoke2.png";
+      treeImage.src = "./resources/Environment/tree.png";
+      rockImage.src = "./resources/Environment/rock.png";
 
       setInterval(draw, 1000/refreshrate);
-      //setInterval(generateRandomSmoke, 500);
+      setInterval(generateRandomSmoke, 500);
+
+      generateRandomObjects("tree", 1);
+      generateRandomObjects("rock", 2);
+
+      console.log(treeList);
+      console.log(rockList);
     }
 
     function generateRandomSmoke() {
@@ -320,11 +385,43 @@
         height: 128,
         image: smokeImage,
         numberOfFrames: 10,
+        ticksPerFrame: 30,
         x: Math.floor((Math.random() * 800) + 1),
         y: Math.floor((Math.random() * 800) + 1)
       });
 
       smokeList.push(smoke);
+    }
+
+    function generateRandomObjects(type, amount) {
+      for (var i = 0; i < amount; i++) {
+        switch (type) {
+          case "tree":
+            var tree = EnvObj({
+              context: ctx,
+              width: 87,
+              height: 87,
+              image: treeImage,
+              x: Math.floor((Math.random() * 800) + 1),
+              y: Math.floor((Math.random() * 800) + 1)
+            });
+
+            treeList.push(tree);
+            break;
+          case "rock":
+            var rock = EnvObj({
+              context: ctx,
+              width: 43,
+              height: 43,
+              image: rockImage,
+              x: Math.floor((Math.random() * 800) + 1),
+              y: Math.floor((Math.random() * 800) + 1)
+            });
+
+            rockList.push(rock);
+            break;
+        }
+      }
     }
 
     function websocketAction(action)
@@ -448,8 +545,23 @@
       for (k in bullets){
         drawObject("bullet", bullets[k].posX, bullets[k].posY, bulletWidth, bulletHeight, "b", bullets[k].direction);
       }
+
       for (k in users) {
         drawObject("tank", users[k].posX, users[k].posY, tankWidth, tankHeight, users[k].color, users[k].direction);
+      }
+
+      for (k in rockList) {
+        if (rockList[k].destroy === true) {
+          continue;
+        }
+        rockList[k].render();
+      }
+
+      for (k in treeList) {
+        if (treeList[k].destroy === true) {
+          continue;
+        }
+        treeList[k].render();
       }
 
       for (k in smokeList) {
