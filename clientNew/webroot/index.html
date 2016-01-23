@@ -33,10 +33,6 @@
       var keyRightPressed = false;
 
       var websocket = new WebSocket("ws://localhost:8080/echo");
-      // websocket.onmessage = function(str)
-      // {
-      //   //document.getElementById('test').innerHTML += str.data + "<br />";
-      // };
 
       function doKeyDown(evt) {
         switch (evt.keyCode) {
@@ -466,7 +462,7 @@
       rockImage.src = "./resources/Environment/rock.png";
 
       setInterval(draw, 1000/refreshrate);
-      setInterval(generateRandomSmoke, 500);
+      // setInterval(generateRandomSmoke, 500);
 
       generateRandomObjects("tree", 1);
       generateRandomObjects("rock", 2);

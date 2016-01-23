@@ -43,7 +43,7 @@ func manageWebSocket(ws *websocket.Conn) {
 		serverMessage := <-serverMsg
 		serverMessageString := strings.SplitN(string(serverMessage), ";", 3)
 		// log.Println(serverMessageString)
-		log.Println(waitingRequests)
+		// log.Println(waitingRequests)
 		if len(serverMessageString) == 3 {
 			switch serverMessageString[1] {
 			case "LOGIN":

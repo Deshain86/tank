@@ -10,7 +10,7 @@ import (
 	"../engine"
 )
 
-const framePerSec int64 = 10
+const framePerSec int64 = 30
 const timePerFrame int64 = 1000000 / framePerSec
 
 func sendResponse(conn *net.UDPConn, addr *net.UDPAddr, msg string) {
@@ -45,7 +45,6 @@ func main() {
 			actualTime := time.Now().UnixNano()
 
 			server.SendAll()
-			log.Print("sendAll")
 			log.Print("timeNow", time.Now())
 
 			differenceTime := (time.Now().UnixNano() - actualTime) / 1000 //microseconds
@@ -55,8 +54,6 @@ func main() {
 				//	log.Println(time.Duration(timePerFrame-differenceTime) * time.Microsecond)
 				time.Sleep(time.Duration(timePerFrame-differenceTime) * time.Microsecond)
 			}
-
-			//			log.Panic("swer")
 		}
 
 	}()
@@ -83,10 +80,6 @@ func main() {
 			default:
 				server.ParseResponse(tmp[0], tmp[1], remoteaddr)
 			}
-		}
-
-		for {
-
 		}
 	}
 

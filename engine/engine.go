@@ -20,25 +20,10 @@ forLoop:
 			continue forLoop
 		}
 
-		if c.Fire {
-			if c.LastFire == 0 {
-				c.LastFire = 20 * int(refreshModifier)
-				s.bullets = append(s.bullets,
-					&Bullet{
-						speed:     c.Speed + bulletSpeed,
-						ownerId:   c.id,
-						x:         c.PositionX + tankWidthHalf - bulletWidthHalf,
-						y:         c.PositionY + tankHeightHalf - bulletHeightHalf,
-						direction: c.Direction})
-			}
-		}
-		if c.LastFire > 0 {
-			c.LastFire--
-		}
-
+		var speed float32
 		// var speed = c.Speed * refreshModifier
 		if c.Moving {
-			var speed = s.setSpeedTank(c, refreshModifier)
+			speed = s.setSpeedTank(c, refreshModifier)
 			newPositionX := c.PositionX
 			newPositionY := c.PositionY
 			switch c.Direction {
@@ -65,5 +50,22 @@ forLoop:
 			}
 			s.checkColision(c, newPositionX, newPositionY)
 		}
+
+		if c.Fire {
+			if c.LastFire == 0 {
+				c.LastFire = 20 * int(refreshModifier)
+				s.bullets = append(s.bullets,
+					&Bullet{
+						speed:     speed + bulletSpeed,
+						ownerId:   c.id,
+						x:         c.PositionX + tankWidthHalf - bulletWidthHalf,
+						y:         c.PositionY + tankHeightHalf - bulletHeightHalf,
+						direction: c.Direction})
+			}
+		}
+		if c.LastFire > 0 {
+			c.LastFire--
+		}
+
 	}
 }
